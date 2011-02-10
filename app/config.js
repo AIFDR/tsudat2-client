@@ -24,6 +24,19 @@ if (java.lang.System.getProperty("app.debug")) {
             [(/^\/geoserver\/(.*)/), require("./proxy").pass({url: geoserver, preserveHost: true})]
         );
     }
+
+    // proxy a remote tsudat app on /tsudat by setting proxy.server to remote URL
+    // only recommended for debug mode
+    var tsudat = java.lang.System.getProperty("app.proxy.tsudat");
+    if (tsudat) {
+        if (tsudat.charAt(tsudat.length-1) !== "/") {
+            tsudat = tsudat + "/";
+        }
+        // debug specific proxy
+        urls.push(
+            [(/^\/tsudat\/(.*)/), require("./proxy").pass({url: tsudat, preserveHost: true})]
+        );
+    }
 }
 
 exports.urls = urls;
