@@ -1,13 +1,4 @@
-# Ready GXP
-
-The intention of this project is to provide a simple reusable template for 
-GeoExt applications bound for a servlet container.
-
-## Setup
-
-    curl https://github.com/opengeo/readygxp/raw/master/readygxp.sh | sh -s myapp
-
-Enhancements to come later.  For now, an application can be run as follows:
+# TsuDat2 Client
 
 ## Debug Mode
 

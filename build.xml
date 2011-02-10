@@ -2,7 +2,7 @@
 <project name="tsudat2-client" default="dist" basedir=".">
 
     <description>
-        Ready GXP Build File
+        TsuDat2 Client Build File
     </description>
 
     <property name="build" location="build"/>
