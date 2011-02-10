@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>TsuDat2 Client</title>
+        <title>TsuDat2</title>
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link rel="shortcut icon" href="theme/app/img/favicon.ico">
@@ -16,7 +16,6 @@
 
         <!-- Ext resources -->
         <link rel="stylesheet" type="text/css" href="externals/ext/resources/css/ext-all.css" />
-        <link rel="stylesheet" type="text/css" href="externals/ext/resources/css/xtheme-gray.css" />
         <script type="text/javascript" src="externals/ext/adapter/ext/ext-base.js"></script>
         <script type="text/javascript" src="externals/ext/ext-all.js"></script>
 
@@ -27,8 +26,10 @@
         <!-- GeoExt resources -->
         <link rel="stylesheet" type="text/css" href="externals/geoext/resources/css/popup.css" />
         <link rel="stylesheet" type="text/css" href="externals/geoext/resources/css/layerlegend.css" />
-        <link rel="stylesheet" type="text/css" href="externals/geoext/resources/css/gxtheme-gray.css" />
         <script type="text/javascript" src="script/GeoExt.js"></script> 
+
+        <!-- ux resources -->
+        <script type="text/javascript" src="script/ux.js"></script> 
 
         <!-- gxp resources -->
         <link rel="stylesheet" type="text/css" href="externals/gxp/src/theme/all.css" />
@@ -43,6 +44,70 @@
         <link rel="stylesheet" type="text/css" href="theme/app/style.css" />
         <!--[if IE]><link rel="stylesheet" type="text/css" href="theme/app/ie.css"/><![endif]-->        
         <script type="text/javascript" src="script/app.js"></script>
+        
+        <script type="text/javascript">
+
+            var app = new TsuDat2({
+                
+                proxy: "/proxy?url=",
+
+                sources: {
+                    local: {    
+                        url: "/geoserver/ows",
+                        title: "Local GeoServer"
+                    },
+                    google: {
+                        ptype: "gxp_googlesource"
+                    },
+                    ol: {
+                        ptype: "gxp_olsource"
+                    }
+                },
+
+                map: {
+                    projection: "EPSG:900913",
+                    units: "m",
+                    numZoomLevels: 21,
+                    maxResolution: 156543.0339,
+                    maxExtent: [
+                        -20037508.34, -20037508.34,
+                        20037508.34, 20037508.34
+                    ],
+                    extent: [10960669.194137,-5832894.945216,18846524.526849,399474.591928],
+                    layers: [{
+                        source: "local",
+                        name: "tsudat:tsudat_hazardpoint"
+                    }, {
+                        source: "local",
+                        name: "tsudat:tsudat_subfault"
+                    }, {
+                        source: "google",
+                        title: "Google Roadmap",
+                        name: "ROADMAP",
+                        group: "background",
+                        fixed: true
+                    }, {
+                        source: "google",
+                        title: "Google Aerial",
+                        name: "SATELLITE",
+                        group: "background",
+                        visible: false,
+                        fixed: true
+                    }, {
+                        source: "ol",
+                        group: "background",
+                        fixed: true,
+                        type: "OpenLayers.Layer",
+                        args: [
+                            "None", {visibility: false}
+                        ],
+                        fixed: true
+                    }]
+                }
+                
+            });
+
+        </script>
 
     </head>
     <body></body>
