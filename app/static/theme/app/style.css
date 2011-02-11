@@ -234,21 +234,18 @@ div.map-overlay div.overlay-element {
     cursor: pointer;
 }
 
-/* GroupManager and custom Add/Edit icons */
-.x-btn .app-icon-boxselect, .x-menu-item .app-icon-boxselect, .sfpark .x-btn .gxp-icon-editfeature {
-    background-image: url(img/silk/cursor.png);
+/* app_tsunamiscenario */
+input.hazardpoint {
+    background-image: url(/geoserver/wms?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&layer=tsudat:tsudat_hazardpoint);
+    background-repeat: no-repeat;
+    background-position: center left;
+    padding-left: 20px;
 }
-.x-btn .app-icon-addgroup, .x-menu-item .app-icon-addgroup, .sfpark .x-btn .gxp-icon-addfeature {
-    background-image: url(img/silk/add.png);
+label.composite {
+    line-height: 24px;
+    padding: 0 .3em 0 .3em;
 }
-
-.x-action-col-icon.app-icon-removegroup {
-    width: 16px;
-    height: 16px;
-    background-image: url(img/silk/delete.png);
-}
-
-/* Increase font size in grids */
-.x-grid3-cell-inner, .x-grid3-hd-inner {
-    font-size: 12px;
+p.x-form-item {
+    padding-top: .5em;
+    padding-bottom: .5em;
 }
