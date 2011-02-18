@@ -81,10 +81,13 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                     id: "step1",
                     title: this.step1Title,
                 }, {
+                    id: "step2",
                     title: this.step2Title
                 }, {
+                    id: "step3",
                     title: this.step3Title
                 }, {
+                    id: "step4",
                     title: this.step4Title
                 }]
             },
@@ -133,8 +136,11 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 padding: 5
             }
         }, {
-            ptype: "app_tsunamiscenario",
+            ptype: "app_scenario",
             outputTarget: "step1"
+        }, {
+            ptype: "app_simulationarea",
+            outputTarget: "step2"
         }]
 
         TsuDat2.superclass.constructor.apply(this, arguments);

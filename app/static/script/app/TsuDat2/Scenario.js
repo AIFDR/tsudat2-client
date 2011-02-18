@@ -2,12 +2,17 @@
  * @require TsuDat2.js
  */
 
-TsuDat2.TsunamiScenario = Ext.extend(gxp.plugins.Tool, {
+TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     
-    ptype: "app_tsunamiscenario",
+    ptype: "app_scenario",
+    
+    /** private: property[selectHazardPoint]
+     *  :class:`gxp.plugins.ClickableFeatures` tool for selecting hazard points
+     *  on the map
+     */
     
     init: function(target) {
-        TsuDat2.TsunamiScenario.superclass.init.apply(this, arguments);
+        TsuDat2.Scenario.superclass.init.apply(this, arguments);
         var epsg4326 = new OpenLayers.Projection("EPSG:4326");
         var format = function(coord, axis) {
             return OpenLayers.Util.getFormattedLonLat(coord, axis, "dm");
@@ -36,7 +41,7 @@ TsuDat2.TsunamiScenario = Ext.extend(gxp.plugins.Tool, {
             scope: this
         });
         
-        new (Ext.extend(gxp.plugins.ClickableFeatures, {
+        this.selectHazardPoint = new (Ext.extend(gxp.plugins.ClickableFeatures, {
             featureManager: this.id + "featuremanager",
             init: function(target) {
                 gxp.plugins.ClickableFeatures.prototype.init.apply(this, arguments);
@@ -55,11 +60,12 @@ TsuDat2.TsunamiScenario = Ext.extend(gxp.plugins.Tool, {
                 }))();
                 target.mapPanel.map.addControl(this.control);
             }
-        }))().init(target);
+        }))();
+        this.selectHazardPoint.init(target);
     },
     
     addOutput: function(config) {
-        return (this.form = TsuDat2.TsunamiScenario.superclass.addOutput.call(this, {
+        return (this.form = TsuDat2.Scenario.superclass.addOutput.call(this, {
             xtype: "form",
             labelWidth: 80,
             defaults: {
@@ -211,14 +217,15 @@ TsuDat2.TsunamiScenario = Ext.extend(gxp.plugins.Tool, {
                 "added": function(cmp, ct) {
                     ct.on({
                         "collapse": function() {
-                            this.control.deactivate();
+                            this.selectHazardPoint.deactivate();
                         },
                         "expand": function() {
-                            this.control.activate();
+                            this.selectHazardPoint.activate();
                         },
                         scope: this
                     });
-                }
+                },
+                scope: this
             }
         }));
     },
@@ -273,4 +280,4 @@ TsuDat2.TsunamiScenario = Ext.extend(gxp.plugins.Tool, {
     
 });
 
-Ext.preg(TsuDat2.TsunamiScenario.prototype.ptype, TsuDat2.TsunamiScenario);
+Ext.preg(TsuDat2.Scenario.prototype.ptype, TsuDat2.Scenario);
