@@ -12,14 +12,14 @@ default.  You only need to run `ant init` once (or any time dependencies
 change).
 
 To use a specific tsudat application, you can add the following option to the
-"ant debug" command:
+`ant debug` command:
 
     -Dapp.proxy.tsudat=<tsudat_url>
 
 where <tsudat_url> is e.g. http://tsudat.dev.opengeo.org/tsudat/.
 
 To use a specific geoserver instance, you can add the following option to the
-"ant debug" command:
+`ant debug` command:
 
     -Dapp.proxy.geoserver=<geoserver_url>
 
@@ -28,8 +28,15 @@ http://tsudat.dev.opengeo.org/geoserver-geonode-dev/
 
 ## Prepare App for Deployment
 
-To create a servlet run the following:
+To create a static war servlet run the following:
 
-    ant
+    ant static-war
 
 The servlet will be assembled in the build directory.
+
+To use a different path for the local GeoServer than `/geoserver/`, you can add
+the following option to the `ant static-war` command:
+
+    -Dapp.deploy.geoserver=<geoserver_path>
+
+where <geoserver_path> is e.g. `/geoserver-geonode-dev/`
