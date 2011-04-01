@@ -10,9 +10,9 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
      *  :class:`gxp.plugins.ClickableFeatures` tool for selecting hazard points
      *  on the map
      */
+    selectHazardPoint: null,
     
     init: function(target) {
-        TsuDat2.Scenario.superclass.init.apply(this, arguments);
         var epsg4326 = new OpenLayers.Projection("EPSG:4326");
         var format = function(coord, axis) {
             return OpenLayers.Util.getFormattedLonLat(coord, axis, "dm");
@@ -31,7 +31,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
             "featureselected": function(evt) {
                 var feature = evt.feature;
                 this.form.hazardPoint.setValue(feature.attributes.tsudat_id);
-                var geom = feature.geometry.transform(
+                var geom = feature.geometry.clone().transform(
                     feature.layer.map.getProjectionObject(), epsg4326
                 );
                 this.form.hazardPointCoords.setValue(
@@ -42,11 +42,11 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
         });
         
         this.selectHazardPoint = new (Ext.extend(gxp.plugins.ClickableFeatures, {
-            featureManager: this.id + "featuremanager",
+            featureManager: featureManager.id,
+            autoActivate: false,
             init: function(target) {
                 gxp.plugins.ClickableFeatures.prototype.init.apply(this, arguments);
                 var tool = this;
-                featureManager.showLayer(this.id);
                 this.control = new (OpenLayers.Class(OpenLayers.Control, {
                     autoActivate: true,
                     initialize: function() {
@@ -59,9 +59,39 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     } 
                 }))();
                 target.mapPanel.map.addControl(this.control);
+            },
+            activate: function() {
+                if (gxp.plugins.ClickableFeatures.prototype.activate.apply(this, arguments)) {
+                    this.control.activate();
+                    featureManager.showLayer(this.id);
+                    return true;
+                }
+            },
+            deactivate: function() {
+                if (gxp.plugins.ClickableFeatures.prototype.deactivate.apply(this, arguments)) {
+                    featureManager.hideLayer(this.id);
+                    this.control.deactivate();
+                    return true;
+                }
             }
         }))();
         this.selectHazardPoint.init(target);
+
+        TsuDat2.Scenario.superclass.init.apply(this, arguments);
+    },
+    
+    activate: function() {
+        if (TsuDat2.Scenario.superclass.activate.apply(this, arguments)) {
+            this.selectHazardPoint.activate();
+            return true;
+        }
+    },
+    
+    deactivate: function() {
+        if (TsuDat2.Scenario.superclass.deactivate.apply(this, arguments)) {
+            this.selectHazardPoint.deactivate();
+            return true;
+        }
     },
     
     addOutput: function(config) {
@@ -100,7 +130,8 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 store: new Ext.data.ArrayStore({
                     proxy: new Ext.data.HttpProxy({
                         method: "GET",
-                        url: "/tsudat/return_periods/"
+                        url: "/tsudat/return_periods/",
+                        disableCaching: false
                     }),
                     autoLoad: true,
                     idIndex: 0,
@@ -216,12 +247,8 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
             listeners: {
                 "added": function(cmp, ct) {
                     ct.on({
-                        "collapse": function() {
-                            this.selectHazardPoint.deactivate();
-                        },
-                        "expand": function() {
-                            this.selectHazardPoint.activate();
-                        },
+                        "collapse": this.deactivate,
+                        "expand": this.activate,
                         scope: this
                     });
                 },
