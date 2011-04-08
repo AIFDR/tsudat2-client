@@ -11,7 +11,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
     legendTabTitle: "Legend",
     step1Title: "Step 1. Tsunami Scenario",
     step2Title: "Step 2. Tsunami Simulation Area",
-    step3Title: "Step 3. Tsunami Source",
+    step3Title: "Step 3. Simulation Parameters",
     step4Title: "Step 4. Generate Tsunami Simulation"
     */
 
@@ -83,12 +83,15 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 }, {
                     id: "step2",
                     title: this.step2Title
+                    //TODO start disabled, enable when step1 is validated
                 }, {
                     id: "step3",
                     title: this.step3Title
+                    //TODO start disabled, enable when step2 is validated
                 }, {
                     id: "step4",
                     title: this.step4Title
+                    //TODO start disabled, enable when step3 is validated
                 }]
             },
             "map"]
@@ -141,6 +144,9 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         }, {
             ptype: "app_simulationarea",
             outputTarget: "step2"
+        }, {
+            ptype: "app_simulationparameters",
+            outputTarget: "step3"
         }]
 
         TsuDat2.superclass.constructor.apply(this, arguments);

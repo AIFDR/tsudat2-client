@@ -41,7 +41,7 @@ body {
     background-image: url(img/silk/help.png);
 }
 
-.x-btn .icon-addlayers {
+.x-btn .icon-addlayers, .x-btn .icon-add {
     background-image: url(img/silk/add.png);
 }
 
@@ -119,6 +119,14 @@ body {
 
 .x-btn .icon-find { 
     background-image: url(img/silk/find.png);
+}
+
+.x-btn .icon-draw { 
+    background-image: url(img/silk/pencil.png);
+}
+
+.x-btn .icon-import { 
+    background-image: url(img/silk/page_white_world.png);
 }
 
 .legend-item {
