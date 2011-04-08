@@ -191,58 +191,6 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     text: "m",
                     cls: "composite"
                 }]
-            }, {
-                xtype: "box",
-                autoEl: {
-                    tag: "p",
-                    cls: "x-form-item"
-                },
-                html: "<b>Additionally, define parameters for the simulation.</b> These include tide, duration, etc."
-            }, {
-                xtype: "container",
-                layout: "hbox",
-                fieldLabel: "Tide",
-                items: [{
-                    xtype: "numberfield",
-                    value: 1,
-                    width: 60
-                }, {
-                    xtype: "label",
-                    text: "m",
-                    cls: "composite"
-                }]
-            }, {
-                xtype: "container",
-                layout: "hbox",
-                fieldLabel: "Start time",
-                items: [{
-                    xtype: "numberfield",
-                    value: 0,
-                    width: 60
-                }, {
-                    xtype: "label",
-                    text: "seconds",
-                    cls: "composite"
-                }]
-            }, {
-                xtype: "container",
-                layout: "hbox",
-                fieldLabel: "End time",
-                items: [{
-                    xtype: "numberfield",
-                    value: 1000000,
-                    width: 60
-                }, {
-                    xtype: "label",
-                    text: "seconds",
-                    cls: "composite"
-                }]
-            }, {
-                xtype: "numberfield",
-                fieldLabel: "Smoothing",
-                width: 60,
-                anchor: null,
-                value: 0.00001
             }],
             listeners: {
                 "added": function(cmp, ct) {
