@@ -1,4 +1,4 @@
-var Client = require("ringo/httpclient").Client;
+var clientRequest = require("ringo/httpclient").request;
 var Request = require("ringo/webapp/request").Request;
 var MemoryStream = require("io").MemoryStream;
 var merge = require("ringo/utils/objects").merge;
@@ -37,9 +37,8 @@ function proxyPass(request, url, preserveHost) {
     } else {
         // re-issue request
         var host = parts[2];
-        var client = new Client();
         response = defer();
-        var exchange = client.request({
+        var exchange = clientRequest({
             url: url,
             method: request.method,
             headers: preserveHost ? merge({host: host}, request.headers) : request.headers,
