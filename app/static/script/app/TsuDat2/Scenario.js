@@ -12,74 +12,25 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     
     /** private: property[selectHazardPoint]
      *  :class:`gxp.plugins.ClickableFeatures` tool for selecting hazard points
-     *  on the map
+     *  from the map
      */
     selectHazardPoint: null,
     
+    /** private: property[selectSubfault]
+     *  :class:`gxp.plugins.ClickableFeatures` tool for selecting sub-faults
+     *  from the map
+     */
+    selectSubfault: null,
+    
+    /** private: property[currentGridParams]
+     *  ``String`` current parameters for the events selection in the form's
+     *  eventGrid.
+     */
+    currentGridParams: null,
+
     init: function(target) {
-        var epsg4326 = new OpenLayers.Projection("EPSG:4326");
-        var format = function(coord, axis) {
-            return OpenLayers.Util.getFormattedLonLat(coord, axis, "dm");
-        };
-        
-        var featureManager = new gxp.plugins.FeatureManager({
-            id: this.id + "featuremanager",
-            layer: {
-                source: "local",
-                name: "tsudat:tsudat_hazardpoint"
-            },
-            paging: false
-        });
-        featureManager.init(target);
-        featureManager.featureLayer.events.on({
-            "featureselected": function(evt) {
-                var feature = evt.feature;
-                this.form.hazardPoint.setValue(feature.attributes.tsudat_id);
-                var geom = feature.geometry.clone().transform(
-                    feature.layer.map.getProjectionObject(), epsg4326
-                );
-                this.form.hazardPointCoords.setValue(
-                    format(geom.x, "lat") + ", " + format(geom.y, "lon")
-                );
-            },
-            scope: this
-        });
-        
-        this.selectHazardPoint = new (Ext.extend(gxp.plugins.ClickableFeatures, {
-            featureManager: featureManager.id,
-            autoActivate: false,
-            init: function(target) {
-                gxp.plugins.ClickableFeatures.prototype.init.apply(this, arguments);
-                var tool = this;
-                this.control = new (OpenLayers.Class(OpenLayers.Control, {
-                    autoActivate: true,
-                    initialize: function() {
-                        OpenLayers.Control.prototype.initialize.apply(this, arguments);
-                        this.handler = new OpenLayers.Handler.Click(this, {
-                            click: function(evt) {
-                                tool.noFeatureClick(evt);
-                            }
-                        });
-                    } 
-                }))();
-                target.mapPanel.map.addControl(this.control);
-            },
-            activate: function() {
-                if (gxp.plugins.ClickableFeatures.prototype.activate.apply(this, arguments)) {
-                    this.control.activate();
-                    featureManager.showLayer(this.id);
-                    return true;
-                }
-            },
-            deactivate: function() {
-                if (gxp.plugins.ClickableFeatures.prototype.deactivate.apply(this, arguments)) {
-                    featureManager.hideLayer(this.id);
-                    this.control.deactivate();
-                    return true;
-                }
-            }
-        }))();
-        this.selectHazardPoint.init(target);
+        this.initHazardPointManagement(target);
+        this.initSubfaultManagement(target);
 
         TsuDat2.Scenario.superclass.init.apply(this, arguments);
     },
@@ -87,6 +38,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     activate: function() {
         if (TsuDat2.Scenario.superclass.activate.apply(this, arguments)) {
             this.selectHazardPoint.activate();
+            this.selectSubfault.activate();
             return true;
         }
     },
@@ -94,6 +46,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     deactivate: function() {
         if (TsuDat2.Scenario.superclass.deactivate.apply(this, arguments)) {
             this.selectHazardPoint.deactivate();
+            this.selectSubfault.deactivate();
             return true;
         }
     },
@@ -102,6 +55,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
         return (this.form = TsuDat2.Scenario.superclass.addOutput.call(this, {
             xtype: "form",
             labelWidth: 80,
+            monitorValid: true,
             defaults: {
                 anchor: "100%",
                 allowBlank: false,
@@ -124,7 +78,11 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 readOnly: true,
                 cls: "hazardpoint", // add GetLegendGraphic icon
                 listeners: {
-                    "valid": this.setWaveHeight,
+                    "valid": function() {
+                        this.setWaveHeight();
+                        this.updateEventGrid();
+                    },
+                    "invalid": this.hideEventGrid,
                     scope: this
                 }
             }, {
@@ -181,7 +139,11 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     width: 50,
                     allowBlank: false,
                     listeners: {
-                        "valid": this.setReturnPeriod,
+                        "valid": function() {
+                            this.setReturnPeriod();
+                            this.updateEventGrid();
+                        },
+                        "invalid": this.hideEventGrid,
                         scope: this
                     }
                 }, {
@@ -195,7 +157,11 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     width: 50,
                     allowBlank: false,
                     listeners: {
-                        "valid": this.setReturnPeriod,
+                        "valid": function() {
+                            this.setReturnPeriod();
+                            this.updateEventGrid();
+                        },
+                        "invalid": this.hideEventGrid,
                         scope: this
                     }
                 }, {
@@ -218,6 +184,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 fieldLabel: "Source",
                 items: [{
                     xtype: "combo",
+                    ref: "../sourceZone",
                     flex: 1,
                     store: new Ext.data.JsonStore({
                         proxy: new Ext.data.HttpProxy({
@@ -231,7 +198,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                         autoLoad: true,
                         idProperty: "pk",
                         fields: [
-                            {name: "source_zone", mapping: "pk"},
+                            {name: "source_zone", mapping: "fields.tsudat_id"},
                             {name: "name", mapping: "fields.name"}
                         ],
                     }),
@@ -239,10 +206,65 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     triggerAction: "all",
                     valueField: "source_zone",
                     displayField: "name",
+                    hiddenName: this.id + "source_zone",
                     allowBlank: false,
                     cls: "subfault", // add GetLegendGraphic icon
-                    editable: false
+                    forceSelection: true,
+                    listeners: {
+                        "select": function(combo, rec) {
+                            this.target.tools[this.selectSubfault.featureManager].loadFeatures(
+                                new OpenLayers.Filter.Comparison({
+                                    type: OpenLayers.Filter.Comparison.EQUAL_TO,
+                                    property: "source_zone_id",
+                                    value: rec.id
+                                })
+                            );
+                        },
+                        "valid": function() {
+                            // update the grid in the next cycle, to make sure
+                            // that getValue() returns the valueField's value,
+                            // not the displayField's.
+                            window.setTimeout(
+                                this.updateEventGrid.createDelegate(this),
+                                0
+                            );
+                        },
+                        "invalid": this.hideEventGrid,
+                        scope: this
+                    }
                 }]
+            }, {
+                xtype: "box",
+                ref: "eventGridDescription",
+                autoEl: {
+                    tag: "p",
+                    cls: "x-form-item"
+                },
+                html: "Once the tsunami scenario has been defined and a hazard source selected, a table below will be populated with the events valid for this set of parameters."
+            }, {
+                xtype: "grid",
+                ref: "eventGrid",
+                hidden: true,
+                height: 150,
+                store: new Ext.data.JsonStore({
+                    proxy: new Ext.data.HttpProxy({
+                        method: "GET",
+                        url: "/tsudat/events",
+                        disableCaching: false
+                    }),
+                    root: function(o) {
+                        return o;
+                    },
+                    idProperty: "pk",
+                    fields: [
+                        {name: "id", mapping: "fields.event"},
+                        {name: "wave_height", mapping: "fields.wave_height"}
+                    ],
+                }),
+                columns: [
+                    {header: "ID", dataIndex: "id"},
+                    {header: "Wave Height", dataIndex: "wave_height"}
+                ]
             }],
             listeners: {
                 "added": function(cmp, ct) {
@@ -257,9 +279,120 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
         }));
     },
     
+    initHazardPointManagement: function(target) {
+        var epsg4326 = new OpenLayers.Projection("EPSG:4326");
+        var format = function(coord, axis) {
+            return OpenLayers.Util.getFormattedLonLat(coord, axis, "dm");
+        };
+        
+        var hazardPointManager = new gxp.plugins.FeatureManager({
+            id: this.id + "hazardpointmanager",
+            layer: {
+                source: "local",
+                name: "tsudat:tsudat_hazardpoint"
+            },
+            paging: false,
             symbolizer: this.symbolizer
         });
+        hazardPointManager.init(target);
+        this.selectHazardPoint = new (Ext.extend(gxp.plugins.ClickableFeatures, {
+            featureManager: hazardPointManager.id,
+            autoActivate: false,
+            parent: this,
+            init: function(target) {
+                gxp.plugins.ClickableFeatures.prototype.init.apply(this, arguments);
+                var tool = this;
+                this.control = new OpenLayers.Control({
+                    autoActivate: true,
+                    handler: new OpenLayers.Handler.Click(this, {
+                        click: function(evt) {
+                            tool.noFeatureClick(evt);
+                        }
+                    }),
+                    displayClass: "appSelectHazardPoint"
+                });
+                target.mapPanel.map.addControl(this.control);
+            },
+            activate: function() {
+                if (gxp.plugins.ClickableFeatures.prototype.activate.apply(this, arguments)) {
+                    this.control.activate();
+                    hazardPointManager.showLayer(this.id);
+                    return true;
+                }
+            },
+            deactivate: function() {
+                if (gxp.plugins.ClickableFeatures.prototype.deactivate.apply(this, arguments)) {
+                    hazardPointManager.hideLayer(this.id);
+                    this.control.deactivate();
+                    return true;
+                }
+            },
+            select: function(feature) {
+                this.parent.form.hazardPoint.setValue(feature.attributes.tsudat_id);
+                var geom = feature.geometry.clone().transform(
+                    feature.layer.map.getProjectionObject(), epsg4326
+                );
+                this.parent.form.hazardPointCoords.setValue(
+                    format(geom.x, "lat") + ", " + format(geom.y, "lon")
+                );
+            }
+        }))();
+        this.selectHazardPoint.init(target);
+    },
+    
+    initSubfaultManagement: function(target) {
+        var subfaultManager = new gxp.plugins.FeatureManager({
+            id: this.id + "subfaultmanager",
+            layer: {
+                source: "local",
+                name: "tsudat:tsudat_subfault"
+            },
+            paging: false,
             symbolizer: this.symbolizer
+        });
+        subfaultManager.init(target);
+        this.selectSubfault = new (Ext.extend(gxp.plugins.ClickableFeatures, {
+            featureManager: subfaultManager.id,
+            autoActivate: false,
+            parent: this,
+            init: function(target) {
+                gxp.plugins.ClickableFeatures.prototype.init.apply(this, arguments);
+                var tool = this;
+                this.control = new OpenLayers.Control({
+                    autoActivate: true,
+                    handler: new OpenLayers.Handler.Click(this, {
+                        click: function(evt) {
+                            tool.noFeatureClick(evt);
+                        }
+                    }),
+                    displayClass: "appSelectSubfault"
+                });
+                target.mapPanel.map.addControl(this.control);
+            },
+            activate: function() {
+                if (gxp.plugins.ClickableFeatures.prototype.activate.apply(this, arguments)) {
+                    this.control.activate();
+                    subfaultManager.showLayer(this.id);
+                    return true;
+                }
+            },
+            deactivate: function() {
+                if (gxp.plugins.ClickableFeatures.prototype.deactivate.apply(this, arguments)) {
+                    subfaultManager.hideLayer(this.id);
+                    this.control.deactivate();
+                    return true;
+                }
+            },
+            select: function(feature) {
+                var sourceZone = this.parent.form.sourceZone;
+                sourceZone.store.clearFilter();
+                var rec = sourceZone.store.getById(feature.attributes.source_zone_id);
+                sourceZone.setValue(rec.get("source_zone"));
+            }
+        }))();
+        this.selectSubfault.init(target);
+    },
+    
     setWaveHeight: function() {
         if (!this.form) {
             return;
@@ -306,8 +439,62 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 scope: this
             });
         }
-    }
+    },
     
+    updateEventGrid: function() {
+        if (!this.form) {
+            return;
+        }
+        var hp = this.form.hazardPoint.getValue(),
+            wh = this.form.waveHeight.getValue(),
+            whd = this.form.waveHeightDelta.getValue(),
+            sz = this.form.sourceZone.getValue(),
+            valid = hp !== "" && wh !== "" && whd !== "" && sz !== "",
+            params = {
+                hp: hp,
+                wh: wh,
+                whd: whd,
+                sz: sz
+            },
+            gridParams = Ext.encode(params);
+        if (valid) {
+            if (gridParams != this.currentGridParams) {
+                this.currentGridParams = gridParams;
+                this.showEventGrid();
+                new Ext.LoadMask(this.form.eventGrid.body, {
+                    store: this.form.eventGrid.store
+                }).show();
+                this.form.eventGrid.store.load({
+                    params: params,
+                    callback: function(records) {
+                        this.showEventGrid(records.length);
+                    },
+                    scope: this
+                });
+            }
+        } else {
+            this.hideEventGrid();
+        }
+    },
+    
+    showEventGrid: function(count) {
+        if (this.form) {
+            this.form.eventGridDescription.el.update(count != null ? String.format(
+                "<b>Select one of the {0} events</b> for the tsunami scenario:",
+                count
+            ) : "Loading the events valid for this set of parameters...");
+            this.form.eventGrid.show();
+        }
+    },
+    
+    hideEventGrid: function() {
+        if (this.form && !this.form.eventGrid.hidden) {
+            this.form.eventGrid.hide();
+            this.form.eventGridDescription.el.update(this.form.eventGridDescription.initialConfig.html);
+            this.currentGridParams = null;
+        }
+    }
+        
 });
 
 Ext.preg(TsuDat2.Scenario.prototype.ptype, TsuDat2.Scenario);
