@@ -199,6 +199,46 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     text: "m",
                     cls: "composite"
                 }]
+            }, {
+                xtype: "box",
+                autoEl: {
+                    tag: "p",
+                    cls: "x-form-item"
+                },
+                html: "<b>Additionally, define the hazard source for the tsunami simulation.</b> Choose from the options below or select a sub-fault from the map."
+            }, {
+                // wrapping combo box to avoid reduced initial width in Webkit
+                xtype: "container",
+                layout: "hbox",
+                cls: "composite-wrap",
+                fieldLabel: "Source",
+                items: [{
+                    xtype: "combo",
+                    flex: 1,
+                    store: new Ext.data.JsonStore({
+                        proxy: new Ext.data.HttpProxy({
+                            method: "GET",
+                            url: "/tsudat/source_zones",
+                            disableCaching: false
+                        }),
+                        root: function(o) {
+                            return o;
+                        },
+                        autoLoad: true,
+                        idProperty: "pk",
+                        fields: [
+                            {name: "source_zone", mapping: "pk"},
+                            {name: "name", mapping: "fields.name"}
+                        ],
+                    }),
+                    mode: "local",
+                    triggerAction: "all",
+                    valueField: "source_zone",
+                    displayField: "name",
+                    allowBlank: false,
+                    cls: "subfault", // add GetLegendGraphic icon
+                    editable: false
+                }]
             }],
             listeners: {
                 "added": function(cmp, ct) {

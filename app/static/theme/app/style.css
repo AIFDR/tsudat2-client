@@ -249,9 +249,18 @@ input.hazardpoint {
     background-position: center left;
     padding-left: 20px;
 }
+input.subfault {
+    background-image: url(/geoserver/wms?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&layer=tsudat:tsudat_subfault);
+    background-repeat: no-repeat;
+    background-position: center left;
+    padding-left: 20px;
+}
 label.composite {
-    line-height: 23px;
+    line-height: 22px;
     padding: 0 .4em 0 .4em;
+}
+.composite-wrap {
+    height: 22px;
 }
 p.x-form-item {
     padding-top: .5em;

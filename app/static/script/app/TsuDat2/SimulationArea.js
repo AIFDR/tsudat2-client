@@ -96,6 +96,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             }, {
                 xtype: "container",
                 layout: "hbox",
+                cls: "composite-wrap",
                 fieldLabel: "Simulation Area",
                 items: [{
                     xtype: "button",
@@ -145,6 +146,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             }, {
                 xtype: "container",
                 layout: "hbox",
+                cls: "composite-wrap",
                 fieldLabel: "Mesh Resolution",
                 items: [{
                     xtype: "numberfield",
@@ -169,6 +171,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             }, {
                 xtype: "container",
                 layout: "hbox",
+                cls: "composite-wrap",
                 fieldLabel: "Elevation Data",
                 items: [{
                     xtype: "button",
@@ -185,6 +188,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             }, {
                 xtype: "container",
                 layout: "hbox",
+                cls: "composite-wrap",
                 cls: "x-form-item",
                 items: [{
                     xtype: "button",
