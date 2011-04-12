@@ -6,6 +6,10 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     
     ptype: "app_scenario",
     
+    /** api: config[symbolizer]
+     *  ``Object`` Symbolizer for selected hazard points and sub-faults
+     */
+    
     /** private: property[selectHazardPoint]
      *  :class:`gxp.plugins.ClickableFeatures` tool for selecting hazard points
      *  on the map
@@ -253,6 +257,9 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
         }));
     },
     
+            symbolizer: this.symbolizer
+        });
+            symbolizer: this.symbolizer
     setWaveHeight: function() {
         if (!this.form) {
             return;
