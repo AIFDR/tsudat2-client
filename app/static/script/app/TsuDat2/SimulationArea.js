@@ -68,6 +68,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
     activate: function() {
         if (TsuDat2.SimulationArea.superclass.activate.apply(this, arguments)) {
             this.target.mapPanel.map.addLayer(this.vectorLayer);
+            this.modifyControl.activate();
         }
     },
     
@@ -110,6 +111,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                             function setSimulationArea(e) {
                                 this.vectorLayer.events.unregister("featureadded", this, setSimulationArea);                                this.simulationArea = e.feature;
                                 this.drawControl.deactivate();
+                                this.modifyControl.selectControl.unselectAll();
                                 this.modifyControl.selectControl.select(e.feature);
                             }
                             if (pressed) {

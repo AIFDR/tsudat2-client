@@ -266,3 +266,6 @@ p.x-form-item {
     padding-top: .5em;
     padding-bottom: .5em;
 }
+.appSelectHazardPointActive, .appSelectSubfaultActive {
+    cursor: pointer;
+}
