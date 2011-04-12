@@ -99,7 +99,8 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
             xtype: "form",
             labelWidth: 80,
             defaults: {
-                anchor: "100%"
+                anchor: "100%",
+                allowBlank: false,
             },
             items: [{
                 xtype: "box",
@@ -117,51 +118,58 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 fieldLabel: "Hazard Point",
                 emptyText: "Select from map",
                 readOnly: true,
-                allowBlank: false,
                 cls: "hazardpoint", // add GetLegendGraphic icon
                 listeners: {
                     "valid": this.setWaveHeight,
                     scope: this
                 }
             }, {
-                xtype: "combo",
-                ref: "returnPeriod",
+                // wrapping combo box to avoid reduced initial width in Webkit
+                xtype: "container",
+                layout: "hbox",
+                cls: "composite-wrap",
                 fieldLabel: "Return Period",
-                store: new Ext.data.ArrayStore({
-                    proxy: new Ext.data.HttpProxy({
-                        method: "GET",
-                        url: "/tsudat/return_periods/",
-                        disableCaching: false
-                    }),
-                    autoLoad: true,
-                    idIndex: 0,
-                    fields: [
-                        {name: "id", type: "integer"},
-                        "label"
-                    ],
-                    listeners: {
-                        "load": {
-                            fn: function(store) {
-                                var rpField = this.form.returnPeriod;
-                                rpField.setValue(store.getAt(0).get(rpField.valueField));
+                items: [{
+                    xtype: "combo",
+                    ref: "../returnPeriod",
+                    flex: 1,
+                    store: new Ext.data.ArrayStore({
+                        proxy: new Ext.data.HttpProxy({
+                            method: "GET",
+                            url: "/tsudat/return_periods",
+                            disableCaching: false
+                        }),
+                        autoLoad: true,
+                        idIndex: 0,
+                        fields: [
+                            {name: "id", type: "integer"},
+                            "label"
+                        ],
+                        listeners: {
+                            "load": {
+                                fn: function(store) {
+                                    var rpField = this.form.returnPeriod;
+                                    rpField.setValue(store.getAt(0).get(rpField.valueField));
+                                },
+                                single: true
                             },
-                            single: true
-                        },
+                            scope: this
+                        }
+                    }),
+                    mode: "local",
+                    triggerAction: "all",
+                    valueField: "id",
+                    displayField: "label",
+                    editable: false,
+                    listeners: {
+                        "select": this.setWaveHeight,
                         scope: this
                     }
-                }),
-                mode: "local",
-                triggerAction: "all",
-                valueField: "id",
-                displayField: "label",
-                editable: false,
-                listeners: {
-                    "select": this.setWaveHeight,
-                    scope: this
-                }
+                }]
             }, {
                 xtype: "container",
                 layout: "hbox",
+                cls: "composite-wrap",
                 fieldLabel: "Wave Height",
                 items: [{
                     xtype: "numberfield",
