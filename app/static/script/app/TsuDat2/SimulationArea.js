@@ -29,9 +29,9 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
     drawControl: null,
     
     /** private: property[internalPolygonType]
-     *  ``String`` The type selected in the polygon type combo box
+     *  ``Number`` The type selected in the polygon type combo box
      */
-    internalPolygonType: null,
+    internalPolygonType: 1,
     
     /** private: property[simulationArea]
      *  ``OpenLayers.Feature.Vector`` The simulation area
@@ -81,6 +81,20 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
     },
     
     addOutput: function(config) {
+        var internalPolygonTypes = new Ext.data.ArrayStore({
+            proxy: new Ext.data.HttpProxy({
+                method: "GET",
+                url: "/tsudat/internal_polygon_types",
+                disableCaching: false
+            }),
+            autoLoad: true,
+            idIndex: 0,
+            fields: [
+                {name: "id", type: "integer"},
+                "type"
+            ]
+        });
+        
         var output = (this.form = TsuDat2.SimulationArea.superclass.addOutput.call(this, {
             xtype: "form",
             labelWidth: 95,
@@ -232,42 +246,58 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 }, {
                     xtype: "combo",
                     flex: 1,
-                    store: new Ext.data.ArrayStore({
-                        proxy: new Ext.data.HttpProxy({
-                            method: "GET",
-                            url: "/tsudat/internal_polygon_types",
-                            disableCaching: false
-                        }),
-                        autoLoad: true,
-                        idIndex: 0,
-                        fields: [
-                            {name: "id", type: "integer"},
-                            "type"
-                        ]
-                    }),
-                    emptyText: "Select type",
+                    store: internalPolygonTypes,
                     mode: "local",
                     triggerAction: "all",
                     valueField: "id",
                     displayField: "type",
+                    value: this.internalPolygonType,
                     editable: false,
                     listeners: {
                         "select": function(combo, rec) {
-                            this.internalPolygonType = rec.get("type");
+                            this.internalPolygonType = rec.get("id");
                         },
                         scope: this
                     }
                 }]
             }, {
-                xtype: "grid",
+                xtype: "editorgrid",
                 height: 150,
                 sm: new GeoExt.grid.FeatureSelectionModel({
                     selectControl: this.modifyControl.selectControl
                 }),
                 columns: [
-                    {id: "type", dataIndex: "type", header: "Type"},
-                    {id: "value", dataIndex: "value", header: "Value"},
-                    {id: "actions", header: "Actions"}
+                    {
+                        dataIndex: "type",
+                        header: "Type",
+                        renderer: function(value) {
+                            return internalPolygonTypes.getById(value).get("type");
+                        }
+                    }, {
+                        dataIndex: "value",
+                        header: "Value",
+                        renderer: function(value, meta, rec) {
+                            var html = value;
+                            if (rec.get("type") == 3) {
+                                html = "n/a";
+                                meta.css = "x-item-disabled"
+                            }
+                            return html;
+                        }
+                    }, {
+                        xtype: "actioncolumn",
+                        width: 30,
+                        fixed: true,
+                        menuDisabled: true,
+                        hideable: false,
+                        items: [{
+                            iconCls: "icon-delete",
+                            tooltip: "Remove the internal polygon",
+                            handler: function(grid, rowIndex) {
+                                grid.store.removeAt(rowIndex);
+                            }
+                        }]
+                    }
                 ],
                 store: this.featureStore,
                 viewConfig: {forceFit: true}

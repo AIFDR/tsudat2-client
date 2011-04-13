@@ -269,3 +269,9 @@ p.x-form-item {
 .appSelectHazardPointActive, .appSelectSubfaultActive {
     cursor: pointer;
 }
+.x-action-col-icon.icon-delete {
+    background-image: url(img/silk/delete.png);
+    width: 16px;
+    height: 16px;
+}
+
