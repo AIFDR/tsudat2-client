@@ -16,7 +16,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
     */
 
     defaultSourceType: "gxp_wmssource",
-
+    
     constructor: function(config) {
                 
         Ext.applyIf(config.map, {
@@ -159,6 +159,21 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         }]
 
         TsuDat2.superclass.constructor.apply(this, arguments);
+        
+        this.addEvents(
+            /** private: event[valid]
+             *  Triggered when a wizard step is valid. Listeners receive the
+             *  wizard step plugin as 1st and the model options provided by
+             *  the step plugin as 2nd argument.
+             */
+            "valid",
+            
+            /** private: event[invalid]
+             *  Triggered when a wizard step is invalid. Listeners receive the
+             *  wizard step plugin as 1st argument.
+             */
+            "invalid"
+        );
     }
 
 });

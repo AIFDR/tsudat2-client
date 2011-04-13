@@ -274,6 +274,21 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             }],
             listeners: {
                 "added": function(cmp, ct) {
+                    // start disabled because we're not step 1.
+                    ct.disable();
+                    // enable/disable based on Scenario (step 1) validity.
+                    this.target.on({
+                        "valid": function(plugin) {
+                            if (plugin instanceof TsuDat2.Scenario) {
+                                ct.enable();
+                            }
+                        },
+                        "invalid": function(plugin) {
+                            if (plugin instanceof TsuDat2.Scenario) {
+                                ct.disable();
+                            }
+                        }
+                    });
                     ct.on({
                         "expand": this.activate,
                         "collapse": this.deactivate,

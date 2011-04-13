@@ -58,7 +58,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
             monitorValid: true,
             defaults: {
                 anchor: "100%",
-                allowBlank: false,
+                allowBlank: false
             },
             items: [{
                 xtype: "box",
@@ -200,7 +200,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                         fields: [
                             {name: "source_zone", mapping: "fields.tsudat_id"},
                             {name: "name", mapping: "fields.name"}
-                        ],
+                        ]
                     }),
                     mode: "local",
                     triggerAction: "all",
@@ -259,13 +259,34 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     fields: [
                         {name: "id", mapping: "fields.event"},
                         {name: "wave_height", mapping: "fields.wave_height"}
-                    ],
+                    ]
                 }),
                 columns: [
                     {header: "ID", dataIndex: "id"},
                     {header: "Wave Height", dataIndex: "wave_height"}
-                ]
+                ],
+                sm: new Ext.grid.RowSelectionModel({
+                    singleSelect: true,
+                    listeners: {
+                        "selectionchange": function(sm) {
+                            if (sm.getCount() == 0) {
+                                this.target.fireEvent("invalid", this);
+                            } else {
+                                this.target.fireEvent("valid", this, {
+                                    hazard_point: this.form.hazardPoint.getValue(),
+                                    source_zone: this.form.sourceZone.getValue(),
+                                    wave_height_delta: this.form.waveHeightDelta.getValue(),
+                                    wave_height: this.form.waveHeight.getValue(),
+                                    return_period: this.form.returnPeriod.getValue(),
+                                    event: sm.getSelected().get("id")
+                                });
+                            }
+                        },
+                        scope: this
+                    }
+                })
             }],
+            viewConfig: {forceFit: true},
             listeners: {
                 "added": function(cmp, ct) {
                     ct.on({
@@ -460,6 +481,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
         if (valid) {
             if (gridParams != this.currentGridParams) {
                 this.currentGridParams = gridParams;
+                this.form.eventGrid.getSelectionModel().clearSelections();
                 this.showEventGrid();
                 new Ext.LoadMask(this.form.eventGrid.body, {
                     store: this.form.eventGrid.store
