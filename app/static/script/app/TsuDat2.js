@@ -79,7 +79,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 },
                 items: [{
                     id: "step1",
-                    title: this.step1Title,
+                    title: this.step1Title
                 }, {
                     id: "step2",
                     title: this.step2Title
@@ -156,7 +156,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         }, {
             ptype: "app_simulationparameters",
             outputTarget: "step3"
-        }]
+        }];
 
         TsuDat2.superclass.constructor.apply(this, arguments);
         
@@ -177,3 +177,30 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
     }
 
 });
+
+(function() {
+    
+    // global request error handling
+    Ext.util.Observable.observeClass(Ext.data.Connection);
+    Ext.data.Connection.on({
+        "requestexception": function(conn, response, options) {
+            if (response.status) {
+                var msg;
+                try {
+                    var result = Ext.decode(response.responseText);
+                    msg = result.msg + ": " + result.reason;
+                } catch(e) {
+                    msg = "The server returned an error" +
+                        ": " + response.status + " " + response.statusText;
+                }
+                Ext.Msg.show({
+                    title: "Error",
+                    msg: msg,
+                    icon: Ext.MessageBox.ERROR,
+                    buttons: {ok: true}
+                });
+            }
+        }
+    });
+
+})();
