@@ -257,13 +257,19 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     },
                     idProperty: "pk",
                     fields: [
-                        {name: "id", mapping: "fields.event"},
-                        {name: "wave_height", mapping: "fields.wave_height"}
+                        {name: "id", mapping: "fields.event.fields.tsudat_id"},
+                        {name: "probability", mapping: "fields.event.fields.probability"},
+                        {name: "wave_height", mapping: "fields.wave_height"},
+                        {name: "magnitude", mapping: "fields.event.fields.magnitude"},
+                        {name: "slip", mapping: "fields.event.fields.slip"}
                     ]
                 }),
                 columns: [
                     {header: "ID", dataIndex: "id"},
-                    {header: "Wave Height", dataIndex: "wave_height"}
+                    {header: "prob", dataIndex: "probability", tooltip: "Probability"},
+                    {header: "wh", dataIndex: "wave_height", tooltip: "Wave Height"},
+                    {header: "M", dataIndex: "magnitude", tooltip: "Magnitude"},
+                    {header: "slip", dataIndex: "slip", tooltip: "Slip"}
                 ],
                 sm: new Ext.grid.RowSelectionModel({
                     singleSelect: true,
@@ -284,9 +290,9 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                         },
                         scope: this
                     }
-                })
+                }),
+                viewConfig: {forceFit: true}
             }],
-            viewConfig: {forceFit: true},
             listeners: {
                 "added": function(cmp, ct) {
                     ct.on({
