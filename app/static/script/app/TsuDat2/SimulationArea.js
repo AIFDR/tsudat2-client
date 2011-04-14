@@ -84,7 +84,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         var internalPolygonTypes = new Ext.data.ArrayStore({
             proxy: new Ext.data.HttpProxy({
                 method: "GET",
-                url: "/tsudat/internal_polygon_types",
+                url: "/tsudat/internal_polygon_types/",
                 disableCaching: false
             }),
             autoLoad: true,

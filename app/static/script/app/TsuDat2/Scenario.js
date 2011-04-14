@@ -98,7 +98,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     store: new Ext.data.ArrayStore({
                         proxy: new Ext.data.HttpProxy({
                             method: "GET",
-                            url: "/tsudat/return_periods",
+                            url: "/tsudat/return_periods/",
                             disableCaching: false
                         }),
                         autoLoad: true,
@@ -189,7 +189,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     store: new Ext.data.JsonStore({
                         proxy: new Ext.data.HttpProxy({
                             method: "GET",
-                            url: "/tsudat/source_zones",
+                            url: "/tsudat/source_zones/",
                             disableCaching: false
                         }),
                         root: function(o) {
@@ -249,7 +249,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 store: new Ext.data.JsonStore({
                     proxy: new Ext.data.HttpProxy({
                         method: "GET",
-                        url: "/tsudat/events",
+                        url: "/tsudat/events/",
                         disableCaching: false
                     }),
                     root: function(o) {
@@ -429,7 +429,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
         if (hp && rp) {
             Ext.Ajax.request({
                 method: "GET",
-                url: "/tsudat/wave_height",
+                url: "/tsudat/wave_height/",
                 params: {
                     hp: hp,
                     rp: rp
@@ -453,7 +453,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
         if (hp && wh && whd) {
             Ext.Ajax.request({
                 method: "GET",
-                url: "/tsudat/return_period",
+                url: "/tsudat/return_period/",
                 params: {
                     hp: hp,
                     wh: wh,
