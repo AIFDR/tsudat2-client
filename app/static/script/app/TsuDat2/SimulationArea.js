@@ -37,12 +37,27 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
      *  ``OpenLayers.Feature.Vector`` The simulation area
      */
     simulationArea: null,
+    
+    /** private: property[projectId]
+     *  ``Number`` project id, obtained after a POST to /tsudat/project/
+     */
+    projectId: null,
 
     init: function(target) {
         TsuDat2.SimulationArea.superclass.init.apply(this, arguments);
-        this.vectorLayer = new OpenLayers.Layer.Vector(
-            this.id + "_vectorlayer", {displayInLayerSwitcher: false}
-        );
+        this.vectorLayer = new OpenLayers.Layer.Vector(this.id + "_vectorlayer", {
+            projection: new OpenLayers.Projection("EPSG:4326"),
+            displayInLayerSwitcher: false,
+            // because don't read features, have multiple featuretypes in the
+            // layer and a custom server API, we use plain event listeners
+            // instead of a HTTP protocol for C(R)UD operations.
+            eventListeners: {
+                "featureadded": this.persistFeature,
+                "featuremodified": this.persistFeature,
+                "featureremoved": this.persistFeature,
+                scope: this
+            }
+        });
         this.featureStore = new GeoExt.data.FeatureStore({
             layer: this.vectorLayer,
             fields: [
@@ -51,7 +66,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             ],
             featureFilter: new OpenLayers.Filter({
                 evaluate: function(feature) {
-                    return feature.attributes.type !== undefined; 
+                    return feature.attributes.type != null; 
                 } 
             })
         });
@@ -123,7 +138,9 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     listeners: {
                         "toggle": function(button, pressed) {
                             function setSimulationArea(e) {
-                                this.vectorLayer.events.unregister("featureadded", this, setSimulationArea);                                this.simulationArea = e.feature;
+                                this.vectorLayer.events.unregister("featureadded", this, setSimulationArea);
+                                delete e.feature.attributes.type;
+                                this.simulationArea = e.feature;
                                 this.drawControl.deactivate();
                                 this.modifyControl.selectControl.unselectAll();
                                 this.modifyControl.selectControl.select(e.feature);
@@ -140,7 +157,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                                 if (this.simulationArea) {
                                     this.modifyControl.unselectFeature(this.simulationArea);
                                 } else {
-                                    this.vectorLayer.events.unregister("featureadded", this, setSimulationArea);                                this.simulationArea = e.feature;
+                                    this.vectorLayer.events.unregister("featureadded", this, setSimulationArea);
                                 }
                                 if (!this._toggling) {
                                     this.drawControl.deactivate();
@@ -203,9 +220,10 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 html: "<b>Optionally, create internal polygons</b> for areas of interest or to define areas with different mesh resolutions or mesh frictions."
             }, {
                 xtype: "container",
+                ref: "internalPolygons",
                 layout: "hbox",
-                cls: "composite-wrap",
-                cls: "x-form-item",
+                cls: "composite-wrap x-form-item",
+                disabled: true,
                 items: [{
                     xtype: "button",
                     ref: "../drawInternalPolygon",
@@ -215,16 +233,20 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     toggleGroup: "draw",
                     listeners: {
                         "toggle": function(button, pressed) {
-                            function setType(e) {
+                            function setAttributes(e) {
                                 e.feature.attributes.type = this.internalPolygonType;
+                                // everything except area of interest has a value
+                                if (this.internalPolygonType != 3) {
+                                    e.feature.attributes.value = 0;
+                                }
                             }
                             if (pressed) {
                                 this._toggling = this.drawControl.active;
                                 this.modifyControl.selectControl.unselectAll();
                                 this.drawControl.activate();
-                                this.vectorLayer.events.register("beforefeatureadded", this, setType);
+                                this.vectorLayer.events.register("beforefeatureadded", this, setAttributes);
                             } else {
-                                this.vectorLayer.events.unregister("beforefeatureadded", this, setType);
+                                this.vectorLayer.events.unregister("beforefeatureadded", this, setAttributes);
                                 this._toggling || this.drawControl.deactivate();
                                 delete this._toggling;
                             }
@@ -272,6 +294,15 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                         header: "Type",
                         renderer: function(value) {
                             return internalPolygonTypes.getById(value).get("type");
+                        },
+                        editor: {
+                            xtype: "combo",
+                            store: internalPolygonTypes,
+                            mode: "local",
+                            triggerAction: "all",
+                            valueField: "id",
+                            displayField: "type",
+                            editable: false
                         }
                     }, {
                         dataIndex: "value",
@@ -280,10 +311,12 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                             var html = value;
                             if (rec.get("type") == 3) {
                                 html = "n/a";
-                                meta.css = "x-item-disabled"
+                                meta.css = "x-item-disabled";
                             }
                             return html;
-                        }
+                        },
+                        //TODO type dependent validation
+                        editor: {xtype: "numberfield", decimalPrecision: 4}
                     }, {
                         xtype: "actioncolumn",
                         width: 30,
@@ -294,8 +327,10 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                             iconCls: "icon-delete",
                             tooltip: "Remove the internal polygon",
                             handler: function(grid, rowIndex) {
+                                this.modifyControl.unselect(grid.store.getAt(rowIndex).getFeature());
                                 grid.store.removeAt(rowIndex);
-                            }
+                            },
+                            scope: this
                         }]
                     }
                 ],
@@ -343,6 +378,75 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         });
         
         return output;
+    },
+    
+    persistFeature: function(e) {
+        if (e.type == "featureremoved" && !e.feature.fid) {
+            return;
+        }
+        var method,
+            feature = e.feature,
+            isInternalPolygon = feature.attributes.type != null;
+        switch (e.type) {
+            case "featureadded":
+                method = "POST";
+                break;
+            case "featuremodified":
+                var modified = feature.fid ||
+                    !isInternalPolygon && this.projectId;
+                method = modified ? "PUT" : "POST";
+                break;
+            case "featureremoved":
+                method = "DELETE";
+                break;
+        } 
+        if (isInternalPolygon) {
+            url = "/tsudat/internal_polygon/";
+        } else {
+            // simulation area
+            url = "/tsudat/project/";
+            feature.attributes.name = "";
+            feature.attributes.max_area = 0;
+        }
+        var params, json;
+        if (method == "DELETE") {
+            params = {
+                id: feature.fid
+            };
+        } else {
+            feature.attributes.project_id = this.projectId;
+            // casting attributes to string because api does not like numbers
+            var clone = feature.clone();
+            clone.attributes = Ext.apply({}, feature.attributes);
+            for (var i in clone.attributes) {
+                if (typeof clone.attributes[i] == "number") {
+                    clone.attributes[i] = String(clone.attributes[i]);
+                }
+            }
+            json = new OpenLayers.Format.GeoJSON({
+                internalProjection: feature.layer.map.getProjectionObject(),
+                externalProjection: new OpenLayers.Projection("EPSG:4326")
+            }).write(clone);
+        }
+        Ext.Ajax.request({
+            method: method,
+            url: url,
+            params: params,
+            jsonData: json,
+            success: function(request) {
+                this.featureStore.commitChanges();
+                var result = Ext.decode(request.responseText);
+                if (result.id) {
+                    if (isInternalPolygon) {
+                        feature.fid = result.id;
+                    } else {
+                        this.projectId = result.id;
+                        this.form.internalPolygons.enable();
+                    }
+                }
+            },
+            scope: this
+        });
     }
     
 });
