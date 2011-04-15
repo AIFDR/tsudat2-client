@@ -408,12 +408,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             feature.attributes.name = "";
             feature.attributes.max_area = 0;
         }
-        var params, json;
-        if (method == "DELETE") {
-            params = {
-                id: feature.fid
-            };
-        } else {
+        if (method != "POST") {
+            url += this.projectId + "/";
+        }
+        var json;
+        if (method != "DELETE") {
             feature.attributes.project_id = this.projectId;
             // casting attributes to string because api does not like numbers
             var clone = feature.clone();
@@ -431,7 +430,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         Ext.Ajax.request({
             method: method,
             url: url,
-            params: params,
             jsonData: json,
             success: function(request) {
                 this.featureStore.commitChanges();
