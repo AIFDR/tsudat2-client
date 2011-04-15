@@ -184,7 +184,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
     Ext.util.Observable.observeClass(Ext.data.Connection);
     Ext.data.Connection.on({
         "requestexception": function(conn, response, options) {
-            if (response.status) {
+            if (response.status && !options.failure) {
                 var msg;
                 try {
                     var result = Ext.decode(response.responseText);
