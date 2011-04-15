@@ -142,27 +142,23 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                                 delete e.feature.attributes.type;
                                 this.simulationArea = e.feature;
                                 this.drawControl.deactivate();
-                                this.modifyControl.selectControl.unselectAll();
-                                this.modifyControl.selectControl.select(e.feature);
+                                this._toggling || this.modifyControl.selectControl.select(e.feature);
                             }
                             if (pressed) {
                                 if (!this.simulationArea) {
-                                    this._toggling = this.drawControl.active;
                                     this.drawControl.activate();
                                     this.vectorLayer.events.register("featureadded", this, setSimulationArea);
                                 } else {
-                                    this.modifyControl.selectFeature(this.simulationArea);
+                                    if (!this._toggling) {
+                                        this.modifyControl.selectControl.unselectAll();
+                                        this.modifyControl.selectControl.select(this.simulationArea);
+                                    }
                                 }
                             } else {
-                                if (this.simulationArea) {
-                                    this.modifyControl.unselectFeature(this.simulationArea);
-                                } else {
+                                if (!this.simulationArea) {
                                     this.vectorLayer.events.unregister("featureadded", this, setSimulationArea);
                                 }
-                                if (!this._toggling) {
-                                    this.drawControl.deactivate();
-                                }
-                                delete this._toggling;
+                                this.modifyControl.selectControl.unselect(this.simulationArea);
                             }
                         },
                         scope: this
@@ -241,14 +237,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                                 }
                             }
                             if (pressed) {
-                                this._toggling = this.drawControl.active;
-                                this.modifyControl.selectControl.unselectAll();
                                 this.drawControl.activate();
                                 this.vectorLayer.events.register("beforefeatureadded", this, setAttributes);
                             } else {
                                 this.vectorLayer.events.unregister("beforefeatureadded", this, setAttributes);
-                                this._toggling || this.drawControl.deactivate();
-                                delete this._toggling;
+                                this.drawControl.deactivate();
                             }
                         },
                         scope: this
@@ -366,13 +359,21 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         
         this.vectorLayer.events.on({
             "featureselected": function(e) {
+                this._toggling = true;
                 if (e.feature === this.simulationArea) {
                     output.drawSimulationArea.toggle(true);
+                } else {
+                    output.drawInternalPolygon.toggle(false);
+                    output.drawSimulationArea.toggle(false);
                 }
-                output.drawInternalPolygon.toggle(false);
+                delete this._toggling;
             },
             "featureunselected": function(e) {
-                output.drawSimulationArea.toggle(false);
+                if (e.feature === this.simulationArea) {
+                    this._toggling = true;
+                    output.drawSimulationArea.toggle(false);
+                    delete this._toggling;
+                }
             },
             scope: this
         });
