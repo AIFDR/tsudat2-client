@@ -320,7 +320,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                             iconCls: "icon-delete",
                             tooltip: "Remove the internal polygon",
                             handler: function(grid, rowIndex) {
-                                this.modifyControl.unselect(grid.store.getAt(rowIndex).getFeature());
+                                this.modifyControl.unselectFeature(grid.store.getAt(rowIndex).getFeature());
                                 grid.store.removeAt(rowIndex);
                             },
                             scope: this
@@ -382,7 +382,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
     },
     
     persistFeature: function(e) {
-        if (e.type == "featureremoved" && !e.feature.fid) {
+        if (this._commit || e.type == "featureremoved" && !e.feature.fid) {
             return;
         }
         var method,
@@ -410,7 +410,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             feature.attributes.max_area = 0;
         }
         if (method != "POST") {
-            url += this.projectId + "/";
+            url += (isInternalPolygon ? feature.fid : this.projectId) + "/";
         }
         var json;
         if (method != "DELETE") {
@@ -433,7 +433,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             url: url,
             jsonData: json,
             success: function(request) {
-                this.featureStore.commitChanges();
                 var result = Ext.decode(request.responseText);
                 if (result.id) {
                     if (isInternalPolygon) {
@@ -443,6 +442,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                         this.form.internalPolygons.enable();
                     }
                 }
+                // we didn't use a writer, so we remove all dirty marks
+                // manually now that everything is committed
+                this._commit = true;
+                this.featureStore.commitChanges();
+                delete this._commit;
             },
             scope: this
         });
