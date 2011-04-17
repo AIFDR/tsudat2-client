@@ -255,18 +255,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     toggleGroup: "draw",
                     listeners: {
                         "toggle": function(button, pressed) {
-                            function setAttributes(e) {
-                                e.feature.attributes.type = this.internalPolygonType;
-                                // everything except area of interest has a value
-                                if (this.internalPolygonType != 3) {
-                                    e.feature.attributes.value = 0;
-                                }
-                            }
                             if (pressed) {
                                 this.drawControl.activate();
-                                this.vectorLayer.events.register("beforefeatureadded", this, setAttributes);
+                                this.vectorLayer.events.register("beforefeatureadded", this, this.setInternalPolygonAttributes);
                             } else {
-                                this.vectorLayer.events.unregister("beforefeatureadded", this, setAttributes);
+                                this.vectorLayer.events.unregister("beforefeatureadded", this, this.setInternalPolygonAttributes);
                                 this.drawControl.deactivate();
                             }
                         },
@@ -281,6 +274,10 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     iconCls: "icon-import",
                     text: this.internalPolygonsImportButtonText,
                     handler: function() {
+                        this.vectorLayer.events.register("beforefeatureadded", this, function() {
+                            this.vectorLayer.events.unregister("beforefeatureadded", this, arguments.callee);
+                            this.setInternalPolygonAttributes.apply(this, arguments);
+                        });
                         this.showUploadWindow(this.internalPolygonType);
                     },
                     scope: this
@@ -315,9 +312,9 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     {
                         dataIndex: "type",
                         header: this.internalPolygonsGridTypeHeader,
-                        renderer: function(value) {
+                        renderer: (function(value) {
                             return this.internalPolygonTypes.getById(value).get("type");
-                        },
+                        }).createDelegate(this),
                         editor: {
                             xtype: "combo",
                             store: this.internalPolygonTypes,
@@ -545,7 +542,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                             waitMsg: String.format(this.importProgress, humanReadableType),
                             success: function(form, action) {
                                 this.vectorLayer.addFeatures(action.result.features);
-                                this.vectorLayer.map.zoomToExtent(this.vectorLayer.getDataExtent());
+                                this.vectorLayer.map.zoomToExtent(action.result.features[0].geometry.getBounds());
                                 uploadWindow.close();
                             },
                             failure: function(form, action) {
@@ -597,7 +594,16 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         this.simulationArea = e.feature;
         this.drawControl.deactivate();
         this._toggling || this.modifyControl.selectControl.select(e.feature);
+    },
+    
+    setInternalPolygonAttributes: function(e) {
+        e.feature.attributes.type = this.internalPolygonType;
+        // everything except area of interest has a value
+        if (this.internalPolygonType != 3) {
+            e.feature.attributes.value = 0;
+        }
     }
+    
     
     
 });
