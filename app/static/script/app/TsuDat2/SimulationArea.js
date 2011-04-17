@@ -18,6 +18,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
      */
     featureStore: null,
     
+    /** private: property[internalPolygonTypes]
+     *  ``Ext.data.Store`` internal polygon types for combo boxes etc.
+     */
+    internalPolygonTypes: null,
+    
     /** private: property[modifyControl]
      *  ``OpenLayers.Control.ModifyFeature`` modify control for internal polys
      */
@@ -45,6 +50,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
 
     init: function(target) {
         TsuDat2.SimulationArea.superclass.init.apply(this, arguments);
+
         this.vectorLayer = new OpenLayers.Layer.Vector(this.id + "_vectorlayer", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             displayInLayerSwitcher: false,
@@ -78,6 +84,20 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             OpenLayers.Handler.Polygon
         );
         target.mapPanel.map.addControls([this.modifyControl, this.drawControl]);
+
+        this.internalPolygonTypes = new Ext.data.ArrayStore({
+            proxy: new Ext.data.HttpProxy({
+                method: "GET",
+                url: "/tsudat/internal_polygon_types/",
+                disableCaching: false
+            }),
+            autoLoad: true,
+            idIndex: 0,
+            fields: [
+                {name: "id", type: "integer"},
+                "type"
+            ]
+        });
     },
     
     activate: function() {
@@ -96,20 +116,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
     },
     
     addOutput: function(config) {
-        var internalPolygonTypes = new Ext.data.ArrayStore({
-            proxy: new Ext.data.HttpProxy({
-                method: "GET",
-                url: "/tsudat/internal_polygon_types/",
-                disableCaching: false
-            }),
-            autoLoad: true,
-            idIndex: 0,
-            fields: [
-                {name: "id", type: "integer"},
-                "type"
-            ]
-        });
-        
         var output = (this.form = TsuDat2.SimulationArea.superclass.addOutput.call(this, {
             xtype: "form",
             labelWidth: 95,
@@ -137,17 +143,10 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     toggleGroup: "draw",
                     listeners: {
                         "toggle": function(button, pressed) {
-                            function setSimulationArea(e) {
-                                this.vectorLayer.events.unregister("featureadded", this, setSimulationArea);
-                                delete e.feature.attributes.type;
-                                this.simulationArea = e.feature;
-                                this.drawControl.deactivate();
-                                this._toggling || this.modifyControl.selectControl.select(e.feature);
-                            }
                             if (pressed) {
                                 if (!this.simulationArea) {
                                     this.drawControl.activate();
-                                    this.vectorLayer.events.register("featureadded", this, setSimulationArea);
+                                    this.vectorLayer.events.register("featureadded", this, this.setSimulationArea);
                                 } else {
                                     if (!this._toggling) {
                                         this.modifyControl.selectControl.unselectAll();
@@ -156,7 +155,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                                 }
                             } else {
                                 if (!this.simulationArea) {
-                                    this.vectorLayer.events.unregister("featureadded", this, setSimulationArea);
+                                    this.vectorLayer.events.unregister("featureadded", this, this.setSimulationArea);
                                 }
                                 this.modifyControl.selectControl.unselect(this.simulationArea);
                             }
@@ -170,7 +169,12 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 }, {
                     xtype: "button",
                     iconCls: "icon-import",
-                    text: "Import"
+                    text: "Import",
+                    handler: function() {
+                        this.vectorLayer.events.register("featureadded", this, this.setSimulationArea);
+                        this.showUploadWindow();
+                    },
+                    scope: this
                 }]
             }, {
                 xtype: "container",
@@ -253,7 +257,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 }, {
                     xtype: "button",
                     iconCls: "icon-import",
-                    text: "Import"
+                    text: "Import",
+                    handler: function() {
+                        this.showUploadWindow(this.internalPolygonType);
+                    },
+                    scope: this
                 }, {
                     xtype: "label",
                     text: "a",
@@ -261,7 +269,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 }, {
                     xtype: "combo",
                     flex: 1,
-                    store: internalPolygonTypes,
+                    store: this.internalPolygonTypes,
                     mode: "local",
                     triggerAction: "all",
                     valueField: "id",
@@ -286,11 +294,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                         dataIndex: "type",
                         header: "Type",
                         renderer: function(value) {
-                            return internalPolygonTypes.getById(value).get("type");
+                            return this.internalPolygonTypes.getById(value).get("type");
                         },
                         editor: {
                             xtype: "combo",
-                            store: internalPolygonTypes,
+                            store: this.internalPolygonTypes,
                             mode: "local",
                             triggerAction: "all",
                             valueField: "id",
@@ -450,7 +458,126 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             },
             scope: this
         });
+    },
+    
+    showUploadWindow: function(type) {
+        var isInternalPolygon = (type != null),
+            humanReadableType;
+        if (isInternalPolygon) {
+            humanReadableType = this.internalPolygonTypes.getById(type).get("type");
+        } else {
+            humanReadableType = "Simulation Area";
+        }
+        
+        var format = new OpenLayers.Format.GeoJSON({
+            externalProjection: new OpenLayers.Projection("EPSG:4326"),
+            internalProjection: this.vectorLayer.map.getProjectionObject()
+        });
+        
+        var uploadWindow = new Ext.Window({
+            title: String.format("Import a {0}", humanReadableType),
+            width: 250,
+            autoHeight: true,
+            modal: true,
+            items: [{
+                xtype: "form",
+                ref: "form",
+                padding: 10,
+                border: false,
+                autoHeight: true,
+                fileUpload: true,
+                monitorValid: true,
+                labelWidth: 55,
+                defaults: {
+                    anchor: "100%"
+                },
+                items: [{
+                    xtype: "box",
+                    autoEl: {
+                        tag: "p",
+                        cls: "x-form-item"
+                    },
+                    html: String.format(
+                        "<b>Select a {0} in csv format for uploading.</b> If the coordinates are not latitudes and longitudes in WGS84, also provide the appropriate coordinate reference system (CRS), e.g. an EPSG code.",
+                        humanReadableType
+                    )
+                }, {
+                    xtype: "fileuploadfield",
+                    name: "csv_file",
+                    fieldLabel: "CSV file",
+                    allowBlank: false
+                }, {
+                    xtype: "textfield",
+                    ref: "crs",
+                    name: "srs",
+                    fieldLabel: "CRS",
+                    allowBlank: true
+                }],
+                buttons: [{
+                    text: "Upload",
+                    ref: "../uploadButton",
+                    disabled: true,
+                    handler: function() {
+                        if (!uploadWindow.form.crs.getValue()) {
+                            uploadWindow.form.crs.setValue("EPSG:4326");
+                        }
+                        uploadWindow.form.getForm().submit({
+                            url: "/tsudat/polygon_from_csv/",
+                            waitMsg: String.format("Uploading your {0}", humanReadableType),
+                            success: function(form, action) {
+                                this.vectorLayer.addFeatures(action.result.features);
+                                this.vectorLayer.map.zoomToExtent(this.vectorLayer.getDataExtent());
+                                uploadWindow.close();
+                            },
+                            failure: function(form, action) {
+                                Ext.Msg.show({
+                                    title: "Error",
+                                    msg: action.result.msg + ": " + action.result.reason,
+                                    icon: Ext.MessageBox.ERROR,
+                                    buttons: {ok: true}
+                                });
+                            },
+                            scope: this
+                        });
+                    },
+                    scope: this
+                }],
+                listeners: {
+                    "clientvalidation": function(form, valid) {
+                        uploadWindow.form.uploadButton.setDisabled(!valid);
+                    },
+                    "beforeaction": function(form, action) {
+                        if (action instanceof Ext.form.Action.Submit) {
+                            action.handleResponse = function(response) {
+                                response.responseText = response.responseXML.body.firstChild.innerHTML;
+                                var result = Ext.form.Action.Submit.prototype.handleResponse.apply(this, arguments);
+                                if (result.success === undefined) {
+                                    var features = format.read(response.responseText);
+                                    if (features instanceof Array) {
+                                        result = {
+                                            success: true,
+                                            features: features
+                                        };
+                                    }
+                                }
+                                return result;
+                            };
+                        }
+                    }
+                }
+            }]
+        });
+        uploadWindow.show();
+    },
+    
+    setSimulationArea: function(e) {
+        this.vectorLayer.events.unregister("featureadded", this, this.setSimulationArea);
+        delete e.feature.attributes.type;
+        this.simulationArea = e.feature;
+        this.drawControl.deactivate();
+        this._toggling || this.modifyControl.selectControl.select(e.feature);
     }
+    
     
 });
 
