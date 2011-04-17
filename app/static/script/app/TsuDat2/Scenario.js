@@ -4,6 +4,22 @@
 
 TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     
+    /** i18n */
+    hazardPointLabel: "Hazard Point",
+    hazardPointEmptyText: "Select from map",
+    returnPeriodLabel: "Return Period",
+    waveHeightLabel: "Wave Height",
+    sourceDescription: "<b>Additionally, define the hazard source for the tsunami simulation.</b> Choose from the options below or select a sub-fault from the map.",
+    sourceLabel: "Source",
+    eventGridInstructions: "Once the tsunami scenario has been defined and a hazard source selected, a table below will be populated with the events valid for this set of parameters.",
+    probabilityTooltip: "Probability",
+    waveHeightTooltip: "Wave Height",
+    magnitudeTooltip: "Magnitude",
+    slipTooltip: "Slip",
+    selectEventInstructions: "<b>Select one of the {0} events</b> for the tsunami scenario:",
+    loadingEventsMsg: "Loading the events valid for this set of parameters...",
+    /** end i18n */
+    
     ptype: "app_scenario",
     
     /** api: config[symbolizer]
@@ -73,8 +89,8 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
             }, {
                 xtype: "textfield",
                 ref: "hazardPointCoords",
-                fieldLabel: "Hazard Point",
-                emptyText: "Select from map",
+                fieldLabel: this.hazardPointLabel,
+                emptyText: this.hazardPointEmptyText,
                 readOnly: true,
                 cls: "hazardpoint", // add GetLegendGraphic icon
                 listeners: {
@@ -90,7 +106,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 xtype: "container",
                 layout: "hbox",
                 cls: "composite-wrap",
-                fieldLabel: "Return Period",
+                fieldLabel: this.returnPeriodLabel,
                 items: [{
                     xtype: "combo",
                     ref: "../returnPeriod",
@@ -132,7 +148,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 xtype: "container",
                 layout: "hbox",
                 cls: "composite-wrap",
-                fieldLabel: "Wave Height",
+                fieldLabel: this.waveHeightLabel,
                 items: [{
                     xtype: "numberfield",
                     ref: "../waveHeight",
@@ -175,13 +191,13 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     tag: "p",
                     cls: "x-form-item"
                 },
-                html: "<b>Additionally, define the hazard source for the tsunami simulation.</b> Choose from the options below or select a sub-fault from the map."
+                html: this.sourceInstructions
             }, {
                 // wrapping combo box to avoid reduced initial width in Webkit
                 xtype: "container",
                 layout: "hbox",
                 cls: "composite-wrap",
-                fieldLabel: "Source",
+                fieldLabel: this.sourceLabel,
                 items: [{
                     xtype: "combo",
                     ref: "../sourceZone",
@@ -225,8 +241,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                             // that getValue() returns the valueField's value,
                             // not the displayField's.
                             window.setTimeout(
-                                this.updateEventGrid.createDelegate(this),
-                                0
+                                this.updateEventGrid.createDelegate(this), 0
                             );
                         },
                         "invalid": this.hideEventGrid,
@@ -235,12 +250,12 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 }]
             }, {
                 xtype: "box",
-                ref: "eventGridDescription",
+                ref: "eventGridInstructions",
                 autoEl: {
                     tag: "p",
                     cls: "x-form-item"
                 },
-                html: "Once the tsunami scenario has been defined and a hazard source selected, a table below will be populated with the events valid for this set of parameters."
+                html: this.eventGridInstructions
             }, {
                 xtype: "grid",
                 ref: "eventGrid",
@@ -266,10 +281,10 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                 }),
                 columns: [
                     {header: "ID", dataIndex: "id"},
-                    {header: "prob", dataIndex: "probability", tooltip: "Probability"},
-                    {header: "wh", dataIndex: "wave_height", tooltip: "Wave Height"},
-                    {header: "M", dataIndex: "magnitude", tooltip: "Magnitude"},
-                    {header: "slip", dataIndex: "slip", tooltip: "Slip"}
+                    {header: "prob", dataIndex: "probability", tooltip: this.probabilityTooltip},
+                    {header: "wh", dataIndex: "wave_height", tooltip: this.waveHeightTooltip},
+                    {header: "M", dataIndex: "magnitude", tooltip: this.magnitudeTooltip},
+                    {header: "slip", dataIndex: "slip", tooltip: this.slipTooltip}
                 ],
                 sm: new Ext.grid.RowSelectionModel({
                     singleSelect: true,
@@ -507,10 +522,9 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     
     showEventGrid: function(count) {
         if (this.form) {
-            this.form.eventGridDescription.el.update(count != null ? String.format(
-                "<b>Select one of the {0} events</b> for the tsunami scenario:",
-                count
-            ) : "Loading the events valid for this set of parameters...");
+            this.form.eventGridInstructions.el.update(count != null ? String.format(
+                this.selectEventInstructions, count
+            ) : this.loadingEventsMsg);
             this.form.eventGrid.show();
         }
     },
@@ -518,7 +532,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     hideEventGrid: function() {
         if (this.form && !this.form.eventGrid.hidden) {
             this.form.eventGrid.hide();
-            this.form.eventGridDescription.el.update(this.form.eventGridDescription.initialConfig.html);
+            this.form.eventGridInstructions.el.update(this.eventGridInstructions);
             this.currentGridParams = null;
         }
     }

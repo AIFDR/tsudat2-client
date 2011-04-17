@@ -6,14 +6,17 @@ OpenLayers.Layer.Google.v3.animationEnabled = false;
 
 var TsuDat2 = Ext.extend(gxp.Viewer, {
     
-    /** i18n:
+    /** i18n */
     layersTabTitle: "Layers",
     legendTabTitle: "Legend",
     step1Title: "Step 1. Tsunami Scenario",
     step2Title: "Step 2. Tsunami Simulation Area",
     step3Title: "Step 3. Simulation Parameters",
-    step4Title: "Step 4. Generate Tsunami Simulation"
-    */
+    step4Title: "Step 4. Generate Tsunami Simulation",
+    errorTitle: "Error",
+    errorMsg: "{0}: {1}",
+    unknownErrorMsg: "The server returned an error: {0} {1}",
+    /** end i18n */
 
     defaultSourceType: "gxp_wmssource",
     
@@ -24,7 +27,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             region: "center",
             controls: [
                 new OpenLayers.Control.Navigation({zoomWheelOptions: {interval: 250}}),
-                new OpenLayers.Control.PanPanel({slideRatio: .5}),
+                new OpenLayers.Control.PanPanel({slideRatio: 0.5}),
                 new OpenLayers.Control.ZoomPanel(),
                 new OpenLayers.Control.Attribution()
             ]
@@ -174,33 +177,32 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
              */
             "invalid"
         );
+
+        // global request error handling
+        Ext.util.Observable.observeClass(Ext.data.Connection);
+        Ext.data.Connection.on({
+            "requestexception": function(conn, response, options) {
+                if (response.status && !options.failure) {
+                    var msg;
+                    try {
+                        var result = Ext.decode(response.responseText);
+                        msg = String.format(this.errorMsg, result.msg, result.reason);
+                    } catch(e) {
+                        msg = String.format(this.unknownErrorMsg,
+                            response.status, response.statusText
+                        );
+                    }
+                    Ext.Msg.show({
+                        title: this.errorTitle,
+                        msg: msg,
+                        icon: Ext.MessageBox.ERROR,
+                        buttons: {ok: true}
+                    });
+                }
+            },
+            scope: this
+        });
+
     }
 
 });
-
-(function() {
-    
-    // global request error handling
-    Ext.util.Observable.observeClass(Ext.data.Connection);
-    Ext.data.Connection.on({
-        "requestexception": function(conn, response, options) {
-            if (response.status && !options.failure) {
-                var msg;
-                try {
-                    var result = Ext.decode(response.responseText);
-                    msg = result.msg + ": " + result.reason;
-                } catch(e) {
-                    msg = "The server returned an error" +
-                        ": " + response.status + " " + response.statusText;
-                }
-                Ext.Msg.show({
-                    title: "Error",
-                    msg: msg,
-                    icon: Ext.MessageBox.ERROR,
-                    buttons: {ok: true}
-                });
-            }
-        }
-    });
-
-})();

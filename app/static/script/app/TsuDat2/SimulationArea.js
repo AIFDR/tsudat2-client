@@ -4,6 +4,28 @@
 
 TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
     
+    /** i18n */
+    simulationAreaInstructions: "<b>Define the area for the tsunami simulation.</b> Draw or upload the area over which to run the simulation, add and rank elevetion data, then define the default mesh resolution.",
+    simulationAreaLabel: "Simulation Area",
+    simulationAreaDrawButtonText: "Draw",
+    simulationAreaImportButtonText: "Import",
+    meshResolutionLabel: "Mesh Resolution",
+    meshFrictionLabel: "Mesh Friction",
+    elevationDataLabel: "Elevation Data",
+    elevationDataAddButtonText: "Add data",
+    internalPolygonsInstructions: "<b>Optionally, create internal polygons</b> for areas of interest or to define areas with different mesh resolutions or mesh frictions.",
+    internalPolygonsDrawButtonText: "Draw",
+    internalPolygonsImportButtonText: "Import",
+    internalPolygonsGridTypeHeader: "Type",
+    internalPolygonsGridValueHeader: "Value",
+    internalPolygonsRemoveActionTooltip: "Remove the internal polygon",
+    importTitle: "Import a {0}",
+    importInstructions: "<b>Select a {0} in csv format for uploading.</b> If the coordinates are not latitudes and longitudes in WGS84, also provide the appropriate coordinate reference system (CRS), e.g. an EPSG code.",
+    importProgress: "Uploading your {0}",
+    importErrorTitle: "Error",
+    importErrorMsg: "{0}: {1}",
+    /** end i18n */
+    
     ptype: "app_simulationarea",
     
     autoActivate: false,
@@ -128,17 +150,17 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     tag: "p",
                     cls: "x-form-item"
                 },
-                html: "<b>Define the area for the tsunami simulation.</b> Draw or upload the area over which to run the simulation, add and rank elevetion data, then define the default mesh resolution."
+                html: this.simulationAreaInstructions
             }, {
                 xtype: "container",
                 layout: "hbox",
                 cls: "composite-wrap",
-                fieldLabel: "Simulation Area",
+                fieldLabel: this.simulationAreaLabel,
                 items: [{
                     xtype: "button",
                     ref: "../drawSimulationArea",
                     iconCls: "icon-draw",
-                    text: "Draw",
+                    text: this.simulationAreaDrawButtonText,
                     enableToggle: true,
                     toggleGroup: "draw",
                     listeners: {
@@ -169,7 +191,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 }, {
                     xtype: "button",
                     iconCls: "icon-import",
-                    text: "Import",
+                    text: this.simulationAreaImportButtonText,
                     handler: function() {
                         this.vectorLayer.events.register("featureadded", this, this.setSimulationArea);
                         this.showUploadWindow();
@@ -180,7 +202,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 xtype: "container",
                 layout: "hbox",
                 cls: "composite-wrap",
-                fieldLabel: "Mesh Resolution",
+                fieldLabel: this.meshResolutionLabel,
                 items: [{
                     xtype: "numberfield",
                     value: 1000000,
@@ -193,7 +215,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     cls: "composite"
                 }]
             }, {
-                fieldLabel: "Mesh Friction",
+                fieldLabel: this.meshFrictionLabel,
                 xtype: "numberfield",
                 value: 0.0001,
                 width: 60,
@@ -205,11 +227,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 xtype: "container",
                 layout: "hbox",
                 cls: "composite-wrap",
-                fieldLabel: "Elevation Data",
+                fieldLabel: this.elevationDataLabel,
                 items: [{
                     xtype: "button",
                     iconCls: "icon-add",
-                    text: "Add data"
+                    text: this.elevationDataAddButtonText
                 }]
             }, {
                 xtype: "box",
@@ -217,7 +239,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     tag: "p",
                     cls: "x-form-item"
                 },
-                html: "<b>Optionally, create internal polygons</b> for areas of interest or to define areas with different mesh resolutions or mesh frictions."
+                html: this.internalPolygonsInstructions
             }, {
                 xtype: "container",
                 ref: "internalPolygons",
@@ -228,7 +250,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     xtype: "button",
                     ref: "../drawInternalPolygon",
                     iconCls: "icon-draw",
-                    text: "Draw",
+                    text: this.internalPolygonsDrawButtonText,
                     enableToggle: true,
                     toggleGroup: "draw",
                     listeners: {
@@ -257,7 +279,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 }, {
                     xtype: "button",
                     iconCls: "icon-import",
-                    text: "Import",
+                    text: this.internalPolygonsImportButtonText,
                     handler: function() {
                         this.showUploadWindow(this.internalPolygonType);
                     },
@@ -292,7 +314,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 columns: [
                     {
                         dataIndex: "type",
-                        header: "Type",
+                        header: this.internalPolygonsGridTypeHeader,
                         renderer: function(value) {
                             return this.internalPolygonTypes.getById(value).get("type");
                         },
@@ -307,7 +329,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                         }
                     }, {
                         dataIndex: "value",
-                        header: "Value",
+                        header: this.internalPolygonsGridValueHeader,
                         renderer: function(value, meta, rec) {
                             var html = value;
                             if (rec.get("type") == 3) {
@@ -326,7 +348,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                         hideable: false,
                         items: [{
                             iconCls: "icon-delete",
-                            tooltip: "Remove the internal polygon",
+                            tooltip: this.internalPolygonsRemoveActionTooltip,
                             handler: function(grid, rowIndex) {
                                 this.modifyControl.unselectFeature(grid.store.getAt(rowIndex).getFeature());
                                 grid.store.removeAt(rowIndex);
@@ -466,7 +488,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         if (isInternalPolygon) {
             humanReadableType = this.internalPolygonTypes.getById(type).get("type");
         } else {
-            humanReadableType = "Simulation Area";
+            humanReadableType = this.simulationAreaLabel;
         }
         
         var format = new OpenLayers.Format.GeoJSON({
@@ -475,7 +497,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         });
         
         var uploadWindow = new Ext.Window({
-            title: String.format("Import a {0}", humanReadableType),
+            title: String.format(this.importTitle, humanReadableType),
             width: 250,
             autoHeight: true,
             modal: true,
@@ -497,10 +519,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                         tag: "p",
                         cls: "x-form-item"
                     },
-                    html: String.format(
-                        "<b>Select a {0} in csv format for uploading.</b> If the coordinates are not latitudes and longitudes in WGS84, also provide the appropriate coordinate reference system (CRS), e.g. an EPSG code.",
-                        humanReadableType
-                    )
+                    html: String.format(this.importInstructions, humanReadableType)
                 }, {
                     xtype: "fileuploadfield",
                     name: "csv_file",
@@ -523,7 +542,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                         }
                         uploadWindow.form.getForm().submit({
                             url: "/tsudat/polygon_from_csv/",
-                            waitMsg: String.format("Uploading your {0}", humanReadableType),
+                            waitMsg: String.format(this.importProgress, humanReadableType),
                             success: function(form, action) {
                                 this.vectorLayer.addFeatures(action.result.features);
                                 this.vectorLayer.map.zoomToExtent(this.vectorLayer.getDataExtent());
@@ -531,8 +550,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                             },
                             failure: function(form, action) {
                                 Ext.Msg.show({
-                                    title: "Error",
-                                    msg: action.result.msg + ": " + action.result.reason,
+                                    title: this.importErrorTitle,
+                                    msg: String.format(this.importErrorMsg, action.result.msg, action.result.reason),
                                     icon: Ext.MessageBox.ERROR,
                                     buttons: {ok: true}
                                 });
