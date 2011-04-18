@@ -274,4 +274,7 @@ p.x-form-item {
     width: 16px;
     height: 16px;
 }
+.space-above .x-form-check-wrap {
+    padding-top: .5em;
+}
 
