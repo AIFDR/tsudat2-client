@@ -467,6 +467,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     } else {
                         this.projectId = result.id;
                         this.form.internalPolygons.enable();
+                        this.target.fireEvent("valid", this);
                     }
                 }
                 // we didn't use a writer, so we remove all dirty marks
@@ -600,9 +601,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             e.feature.attributes.value = 0;
         }
     }
-    
-    
-    
+
 });
 
 Ext.preg(TsuDat2.SimulationArea.prototype.ptype, TsuDat2.SimulationArea);
