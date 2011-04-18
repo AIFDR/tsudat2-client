@@ -565,9 +565,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     "beforeaction": function(form, action) {
                         if (action instanceof Ext.form.Action.Submit) {
                             action.handleResponse = function(response) {
-                                //TODO remove the line below as soon as the API
-                                // returns the response as text/html.
-                                response.responseText = response.responseXML.body.firstChild.innerHTML;
                                 var result = Ext.form.Action.Submit.prototype.handleResponse.apply(this, arguments);
                                 if (result.success === undefined) {
                                     var features = format.read(response.responseText);
