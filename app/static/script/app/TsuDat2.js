@@ -76,9 +76,9 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 header: false,
                 border: false,
                 defaults: {
-                    layout: "fit",
                     padding: 10,
-                    hideBorders: true
+                    hideBorders: true,
+                    autoScroll: true
                 },
                 items: [{
                     id: "step1",
@@ -86,15 +86,12 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 }, {
                     id: "step2",
                     title: this.step2Title
-                    //TODO start disabled, enable when step1 is validated
                 }, {
                     id: "step3",
                     title: this.step3Title
-                    //TODO start disabled, enable when step2 is validated
                 }, {
                     id: "step4",
                     title: this.step4Title
-                    //TODO start disabled, enable when step3 is validated
                 }]
             },
             "map"]
@@ -159,6 +156,9 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         }, {
             ptype: "app_simulationparameters",
             outputTarget: "step3"
+        }, {
+            ptype: "app_generatesimulation",
+            outputTarget: "step4"
         }];
 
         TsuDat2.superclass.constructor.apply(this, arguments);
