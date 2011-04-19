@@ -76,8 +76,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         this.vectorLayer = new OpenLayers.Layer.Vector(this.id + "_vectorlayer", {
             projection: new OpenLayers.Projection("EPSG:4326"),
             displayInLayerSwitcher: false,
-            // because don't read features, have multiple featuretypes in the
-            // layer and a custom server API, we use plain event listeners
+            // because we don't read features, have multiple featuretypes in
+            // the layer and a custom server API, we use plain event listeners
             // instead of a HTTP protocol for C(R)UD operations.
             eventListeners: {
                 "featureadded": this.persistFeature,
@@ -168,7 +168,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                             if (pressed) {
                                 if (!this.simulationArea) {
                                     this.drawControl.activate();
-                                    this.vectorLayer.events.register("featureadded", this, this.setSimulationArea);
+                                    this.vectorLayer.events.registerPriority("featureadded", this, this.setSimulationArea);
                                 } else {
                                     if (!this._toggling) {
                                         this.modifyControl.selectControl.unselectAll();
@@ -178,8 +178,9 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                             } else {
                                 if (!this.simulationArea) {
                                     this.vectorLayer.events.unregister("featureadded", this, this.setSimulationArea);
+                                } else {
+                                    this.modifyControl.selectControl.unselect(this.simulationArea);
                                 }
-                                this.modifyControl.selectControl.unselect(this.simulationArea);
                             }
                         },
                         scope: this
@@ -193,7 +194,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     iconCls: "icon-import",
                     text: this.simulationAreaImportButtonText,
                     handler: function() {
-                        this.vectorLayer.events.register("featureadded", this, this.setSimulationArea);
+                        this.vectorLayer.events.registerPriority("featureadded", this, this.setSimulationArea);
                         this.showUploadWindow();
                     },
                     scope: this
@@ -257,7 +258,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                         "toggle": function(button, pressed) {
                             if (pressed) {
                                 this.drawControl.activate();
-                                this.vectorLayer.events.register("beforefeatureadded", this, this.setInternalPolygonAttributes);
+                                this.vectorLayer.events.registerPriority("beforefeatureadded", this, this.setInternalPolygonAttributes);
                             } else {
                                 this.vectorLayer.events.unregister("beforefeatureadded", this, this.setInternalPolygonAttributes);
                                 this.drawControl.deactivate();
@@ -308,52 +309,50 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 sm: new GeoExt.grid.FeatureSelectionModel({
                     selectControl: this.modifyControl.selectControl
                 }),
-                columns: [
-                    {
-                        dataIndex: "type",
-                        header: this.internalPolygonsGridTypeHeader,
-                        renderer: (function(value) {
-                            return this.internalPolygonTypes.getById(value).get("type");
-                        }).createDelegate(this),
-                        editor: {
-                            xtype: "combo",
-                            store: this.internalPolygonTypes,
-                            mode: "local",
-                            triggerAction: "all",
-                            valueField: "id",
-                            displayField: "type",
-                            editable: false
-                        }
-                    }, {
-                        dataIndex: "value",
-                        header: this.internalPolygonsGridValueHeader,
-                        renderer: function(value, meta, rec) {
-                            var html = value;
-                            if (rec.get("type") == 3) {
-                                html = "n/a";
-                                meta.css = "x-item-disabled";
-                            }
-                            return html;
-                        },
-                        //TODO type dependent validation
-                        editor: {xtype: "numberfield", decimalPrecision: 4}
-                    }, {
-                        xtype: "actioncolumn",
-                        width: 30,
-                        fixed: true,
-                        menuDisabled: true,
-                        hideable: false,
-                        items: [{
-                            iconCls: "icon-delete",
-                            tooltip: this.internalPolygonsRemoveActionTooltip,
-                            handler: function(grid, rowIndex) {
-                                this.modifyControl.unselectFeature(grid.store.getAt(rowIndex).getFeature());
-                                grid.store.removeAt(rowIndex);
-                            },
-                            scope: this
-                        }]
+                columns: [{
+                    dataIndex: "type",
+                    header: this.internalPolygonsGridTypeHeader,
+                    renderer: (function(value) {
+                        return this.internalPolygonTypes.getById(value).get("type");
+                    }).createDelegate(this),
+                    editor: {
+                        xtype: "combo",
+                        store: this.internalPolygonTypes,
+                        mode: "local",
+                        triggerAction: "all",
+                        valueField: "id",
+                        displayField: "type",
+                        editable: false
                     }
-                ],
+                }, {
+                    dataIndex: "value",
+                    header: this.internalPolygonsGridValueHeader,
+                    renderer: function(value, meta, rec) {
+                        var html = value;
+                        if (rec.get("type") == 3) {
+                            html = "n/a";
+                            meta.css = "x-item-disabled";
+                        }
+                        return html;
+                    },
+                    //TODO type dependent validation
+                    editor: {xtype: "numberfield", decimalPrecision: 4}
+                }, {
+                    xtype: "actioncolumn",
+                    width: 30,
+                    fixed: true,
+                    menuDisabled: true,
+                    hideable: false,
+                    items: [{
+                        iconCls: "icon-delete",
+                        tooltip: this.internalPolygonsRemoveActionTooltip,
+                        handler: function(grid, rowIndex) {
+                            this.modifyControl.unselectFeature(grid.store.getAt(rowIndex).getFeature());
+                            grid.store.removeAt(rowIndex);
+                        },
+                        scope: this
+                    }]
+                }],
                 store: this.featureStore,
                 viewConfig: {forceFit: true}
             }],
@@ -412,7 +411,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         if (this._commit || e.type == "featureremoved" && !e.feature.fid) {
             return;
         }
-        var method,
+        var url, method,
             feature = e.feature,
             isInternalPolygon = feature.attributes.type != null;
         switch (e.type) {
@@ -433,8 +432,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
         } else {
             // simulation area
             url = "/tsudat/project/";
-            feature.attributes.name = "";
-            feature.attributes.max_area = 0;
         }
         if (method != "POST") {
             url += (isInternalPolygon ? feature.fid : this.projectId) + "/";
@@ -588,7 +585,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
     
     setSimulationArea: function(e) {
         this.vectorLayer.events.unregister("featureadded", this, this.setSimulationArea);
-        delete e.feature.attributes.type;
+        e.feature.attributes.name = "";
+        e.feature.attributes.max_area = 0;
         this.simulationArea = e.feature;
         this.drawControl.deactivate();
         this._toggling || this.modifyControl.selectControl.select(e.feature);
