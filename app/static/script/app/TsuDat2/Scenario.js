@@ -1,8 +1,8 @@
 /*
- * @require TsuDat2.js
+ * @require TsuDat2/WizardStep.js
  */
 
-TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
+TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
     
     /** i18n */
     hazardPointLabel: "Hazard Point",
@@ -22,17 +22,12 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     
     ptype: "app_scenario",
     
+    autoActivate: true,
+    
     /** api: config[symbolizer]
      *  ``Object`` Symbolizer for selected hazard points and sub-faults
      */
     
-    /** api: property[index]
-     *  ``Number`` index of this tool in the wizard container. Useful for
-     *  enabling and disabling step panels when another step changes its valid
-     *  state.
-     */
-    index: null,
-
     /** private: property[selectHazardPoint]
      *  :class:`gxp.plugins.ClickableFeatures` tool for selecting hazard points
      *  from the map
@@ -298,8 +293,10 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     listeners: {
                         "selectionchange": function(sm) {
                             if (sm.getCount() == 0) {
+                                this.valid = false;
                                 this.target.fireEvent("invalid", this);
                             } else {
+                                this.valid = true;
                                 this.target.fireEvent("valid", this, {
                                     hazard_point: this.form.hazardPoint.getValue(),
                                     source_zone: this.form.sourceZone.getValue(),
@@ -314,32 +311,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
                     }
                 }),
                 viewConfig: {forceFit: true}
-            }],
-            listeners: {
-                "added": function(cmp, ct) {
-                    this.index = ct.ownerCt.items.indexOf(ct);
-                    ct.setDisabled(this.index != 0);
-                    this.target.on({
-                        "valid": function(plugin) {
-                            if (plugin.index == this.index - 1) {
-                                ct.enable();
-                            }
-                        },
-                        "invalid": function(plugin) {
-                            if (plugin.index < this.index) {
-                                ct.disable();
-                            }
-                        },
-                        scope: this
-                    });
-                    ct.on({
-                        "collapse": this.deactivate,
-                        "expand": this.activate,
-                        scope: this
-                    });
-                },
-                scope: this
-            }
+            }]
         }));
     },
     
@@ -553,6 +525,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
     
     hideEventGrid: function() {
         if (this.form && !this.form.eventGrid.hidden) {
+            this.form.eventGrid.getSelectionModel().clearSelections();
             this.form.eventGrid.hide();
             this.form.eventGridInstructions.el.update(this.eventGridInstructions);
             this.currentGridParams = null;

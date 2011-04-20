@@ -1,8 +1,8 @@
 /*
- * @require TsuDat2.js
+ * @require TsuDat2/WizardStep.js
  */
 
-TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.Tool, {
+TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
     
     /** i18n */
     scenarioNameLabel: "Scenario Name",
@@ -30,13 +30,6 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.Tool, {
     ptype: "app_generatesimulation",
     
     autoActivate: false,
-    
-    /** api: property[index]
-     *  ``Number`` index of this tool in the wizard container. Useful for
-     *  enabling and disabling step panels when another step changes its valid
-     *  state.
-     */
-    index: null,
     
     /** private: property[vectorLayer]
      *  ``OpenLayers.Layer.Vector`` vector layer to draw gauge points on
@@ -283,42 +276,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.Tool, {
                     cls: "big-button",
                     scale: "large"
                 }
-            ]}),
-            listeners: {
-                "added": function(cmp, ct) {
-                    this.index = ct.ownerCt.items.indexOf(ct);
-                    ct.setDisabled(this.index != 0);
-                    this.target.on({
-                        "valid": function(plugin, data) {
-                            if (plugin.index == this.index - 1) {
-                                ct.enable();
-                            }
-                            if (data && data.projectId) {
-                                this.projectId = data.projectId;
-                            }
-                        },
-                        "invalid": function(plugin) {
-                            if (plugin.index < this.index) {
-                                ct.disable();
-                            }
-                        },
-                        scope: this
-                    });
-                    ct.on({
-                        "expand": this.activate,
-                        "collapse": this.deactivate,
-                        scope: this
-                    });
-                },
-                "clientvalidation": function(fp, valid) {
-                    valid = valid && !this.form.ownerCt.disabled;
-                    if (valid !== this.valid) {
-                        this.valid = valid;
-                        this.target.fireEvent(valid ? "valid" : "invalid", this);
-                    }
-                },
-                scope: this
-            }
+            ]})
         }));
     },
     

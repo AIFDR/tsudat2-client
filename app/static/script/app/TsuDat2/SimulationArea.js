@@ -1,8 +1,8 @@
 /*
- * @require TsuDat2.js
+ * @require TsuDat2/WizardStep.js
  */
 
-TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
+TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
     
     /** i18n */
     simulationAreaInstructions: "<b>Define the area for the tsunami simulation.</b> Draw or upload the area over which to run the simulation, add and rank elevetion data, then define the default mesh resolution.",
@@ -27,15 +27,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
     /** end i18n */
     
     ptype: "app_simulationarea",
-    
-    autoActivate: false,
-    
-    /** api: property[index]
-     *  ``Number`` index of this tool in the wizard container. Useful for
-     *  enabling and disabling step panels when another step changes its valid
-     *  state.
-     */
-    index: null,
     
     /** private: property[vectorLayer]
      *  ``OpenLayers.Layer.Vector`` vector layer to draw internal polygons on
@@ -362,33 +353,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 }],
                 store: this.featureStore,
                 viewConfig: {forceFit: true}
-            }],
-            listeners: {
-                "added": function(cmp, ct) {
-                    this.index = ct.ownerCt.items.indexOf(ct);
-                    ct.setDisabled(this.index != 0);
-                    this.target.on({
-                        "valid": function(plugin) {
-                            if (plugin.index == this.index - 1) {
-                                ct.enable();
-                                this.target.fireEvent(this.projectId ? "valid" : "invalid", this);
-                            }
-                        },
-                        "invalid": function(plugin) {
-                            if (plugin.index < this.index) {
-                                ct.disable();
-                            }
-                        },
-                        scope: this
-                    });
-                    ct.on({
-                        "expand": this.activate,
-                        "collapse": this.deactivate,
-                        scope: this
-                    });
-                },
-                scope: this
-            }
+            }]
         }));
         
         this.vectorLayer.events.on({
@@ -460,6 +425,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                 externalProjection: new OpenLayers.Projection("EPSG:4326")
             }).write(clone);
         }
+        this.valid = false;
+        this.target.fireEvent("invalid", this);
         Ext.Ajax.request({
             method: method,
             url: url,
@@ -472,6 +439,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     } else {
                         this.projectId = result.id;
                         this.form.internalPolygons.enable();
+                        this.valid = true;
                         this.target.fireEvent("valid", this, {projectId: result.id});
                     }
                 }

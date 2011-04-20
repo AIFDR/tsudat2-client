@@ -209,6 +209,20 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             scope: this
         });
 
+    },
+    
+    previousStepsCompleted: function(plugin) {
+        var index = plugin.index, completed = true;
+        if (index > 0) {
+            var tool;
+            for (var i in this.tools) {
+                tool = this.tools[i];
+                if (tool instanceof TsuDat2.WizardStep && tool.index < index) {
+                    completed = completed && tool.valid;
+                }
+            }            
+        }
+        return completed;
     }
 
 });
