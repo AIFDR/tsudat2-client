@@ -69,7 +69,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 id: "east",
                 region: "east",
                 layout: "accordion",
-                width: 250,
+                width: 300,
                 split: true,
                 collapsible: true,
                 collapseMode: "mini",
@@ -165,15 +165,21 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         
         this.addEvents(
             /** private: event[valid]
-             *  Triggered when a wizard step is valid. Listeners receive the
-             *  wizard step plugin as 1st and the model options provided by
-             *  the step plugin as 2nd argument.
+             *  Triggered when a wizard step is valid.
+             *
+             *  Listener arguments:
+             *
+             *  * ``gxp.plugins.Tool`` - the wizard step plugin
+             *  * ``Object`` - data gathered by this wizard step
              */
             "valid",
             
             /** private: event[invalid]
-             *  Triggered when a wizard step is invalid. Listeners receive the
-             *  wizard step plugin as 1st argument.
+             *  Triggered when a wizard step is invalid.
+             *
+             *  Listener arguments:
+             *
+             *  * ``gxp.plugins.Tool`` - the wizard step plugin
              */
             "invalid"
         );
