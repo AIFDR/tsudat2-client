@@ -292,9 +292,9 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.Tool, {
                         "valid": function(plugin, data) {
                             if (plugin.index == this.index - 1) {
                                 ct.enable();
-                                if (data && data.projectId) {
-                                    this.projectId = data.projectId;
-                                }
+                            }
+                            if (data && data.projectId) {
+                                this.projectId = data.projectId;
                             }
                         },
                         "invalid": function(plugin) {
