@@ -26,6 +26,13 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
      *  ``Object`` Symbolizer for selected hazard points and sub-faults
      */
     
+    /** api: property[index]
+     *  ``Number`` index of this tool in the wizard container. Useful for
+     *  enabling and disabling step panels when another step changes its valid
+     *  state.
+     */
+    index: null,
+
     /** private: property[selectHazardPoint]
      *  :class:`gxp.plugins.ClickableFeatures` tool for selecting hazard points
      *  from the map
@@ -310,6 +317,21 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.Tool, {
             }],
             listeners: {
                 "added": function(cmp, ct) {
+                    this.index = ct.ownerCt.items.indexOf(ct);
+                    ct.setDisabled(this.index != 0);
+                    this.target.on({
+                        "valid": function(plugin) {
+                            if (plugin.index == this.index - 1) {
+                                ct.enable();
+                            }
+                        },
+                        "invalid": function(plugin) {
+                            if (plugin.index < this.index) {
+                                ct.disable();
+                            }
+                        },
+                        scope: this
+                    });
                     ct.on({
                         "collapse": this.deactivate,
                         "expand": this.activate,

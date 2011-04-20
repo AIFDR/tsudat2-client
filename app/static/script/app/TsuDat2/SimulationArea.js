@@ -30,6 +30,13 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
     
     autoActivate: false,
     
+    /** api: property[index]
+     *  ``Number`` index of this tool in the wizard container. Useful for
+     *  enabling and disabling step panels when another step changes its valid
+     *  state.
+     */
+    index: null,
+    
     /** private: property[vectorLayer]
      *  ``OpenLayers.Layer.Vector`` vector layer to draw internal polygons on
      */
@@ -358,20 +365,21 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
             }],
             listeners: {
                 "added": function(cmp, ct) {
-                    // start disabled because we're not step 1.
-                    ct.disable();
-                    // enable/disable based on Scenario (step 1) validity.
+                    this.index = ct.ownerCt.items.indexOf(ct);
+                    ct.setDisabled(this.index != 0);
                     this.target.on({
                         "valid": function(plugin) {
-                            if (plugin instanceof TsuDat2.Scenario) {
+                            if (plugin.index == this.index - 1) {
                                 ct.enable();
+                                this.target.fireEvent(this.projectId ? "valid" : "invalid", this);
                             }
                         },
                         "invalid": function(plugin) {
-                            if (plugin instanceof TsuDat2.Scenario) {
+                            if (plugin.index < this.index) {
                                 ct.disable();
                             }
-                        }
+                        },
+                        scope: this
                     });
                     ct.on({
                         "expand": this.activate,
@@ -464,7 +472,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.Tool, {
                     } else {
                         this.projectId = result.id;
                         this.form.internalPolygons.enable();
-                        this.target.fireEvent("valid", this);
+                        this.target.fireEvent("valid", this, {projectId: result.id});
                     }
                 }
                 // we didn't use a writer, so we remove all dirty marks

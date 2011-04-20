@@ -4,8 +4,6 @@
 
 TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.Tool, {
     
-    ptype: "app_simulationparameters",
-    
     /** i18n */
     defineParametersInstructions: "<b>Define parameters for the simulation.</b> These include tide, duration, etc.",
     tideLabel: "Tide",
@@ -14,13 +12,24 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.Tool, {
     smoothingLabel: "Smoothing",
     /** end i18n */
     
+    ptype: "app_simulationparameters",
+    
+    autoActivate: false,
+
+    /** api: property[index]
+     *  ``Number`` index of this tool in the wizard container. Useful for
+     *  enabling and disabling step panels when another step changes its valid
+     *  state.
+     */
+    index: null,
+    
     /** private: property[valid]
      *  ``Boolean`` Is the form currently valid?
      */
     valid: true,
     
     addOutput: function(config) {
-        return (this.form = TsuDat2.SimulationParameters.superclass.addOutput.call(this, {
+        var output = (this.form = TsuDat2.SimulationParameters.superclass.addOutput.call(this, {
             xtype: "form",
             labelWidth: 80,
             monitorValid: true,
@@ -86,18 +95,17 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.Tool, {
             }],
             listeners: {
                 "added": function(cmp, ct) {
-                    // start disabled because we're not step 1.
-                    ct.disable();
-                    // enable/disable based on SimulationArea (step 2) validity.
+                    this.index = ct.ownerCt.items.indexOf(ct);
+                    ct.setDisabled(this.index != 0);
                     this.target.on({
                         "valid": function(plugin) {
-                            if (plugin instanceof TsuDat2.SimulationArea) {
+                            if (plugin.index == this.index - 1) {
                                 ct.enable();
                                 this.target.fireEvent(this.valid ? "valid" : "invalid", this);
                             }
                         },
                         "invalid": function(plugin) {
-                            if (plugin instanceof TsuDat2.SimulationArea) {
+                            if (plugin.index < this.index) {
                                 ct.disable();
                             }
                         },
@@ -110,15 +118,15 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.Tool, {
                     });
                 },
                 "clientvalidation": function(fp, valid) {
-                    valid = valid && !this.form.ownerCt.disabled;
                     if (valid !== this.valid) {
                         this.valid = valid;
-                        this.target.fireEvent(valid ? "valid" : "invalid", this);
+                        this.target.fireEvent(valid ? "valid" : "invalid", this);                            
                     }
                 },
                 scope: this
             }
         }));
+        return output;
     }
     
 });
