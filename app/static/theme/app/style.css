@@ -274,7 +274,13 @@ p.x-form-item {
     width: 16px;
     height: 16px;
 }
-.space-above .x-form-check-wrap {
+.space-above {
     padding-top: .5em;
+}
+.small-space-above {
+    padding-top: .25em;
+}
+.big-button button {
+    font-size: 10pt;
 }
 
