@@ -541,6 +541,13 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                             callback: function() {
                                 // enable "Add data" button
                                 this.addDem.actions[0].enable();
+                                // remove DEM layers that are no longer valid
+                                // for the project
+                                this.target.mapPanel.layers.each(function(rec) {
+                                    if (rec.get("group") == this.demLayerGroup && this.demStore.findExact("typename", rec.get("name")) == -1) {
+                                        this.target.mapPanel.layers.remove(rec);
+                                    }
+                                }, this);
                             },
                             scope: this
                         });
