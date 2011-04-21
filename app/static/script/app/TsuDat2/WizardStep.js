@@ -19,7 +19,7 @@ TsuDat2.WizardStep = Ext.extend(gxp.plugins.Tool, {
     valid: false,
     
     addOutput: function(config) {
-        var output = Ext.ComponentMgr.create(config);
+        var output = Ext.ComponentMgr.create(Ext.apply(config, this.outputConfig));
         output.on("added",function(cmp, ct) {
             this.index = ct.ownerCt.items.indexOf(ct);
             ct.setDisabled(this.index != 0);
