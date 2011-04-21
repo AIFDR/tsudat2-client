@@ -13,6 +13,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
     meshFrictionLabel: "Mesh Friction",
     elevationDataLabel: "Elevation Data",
     elevationDataAddButtonText: "Add data",
+    elevationDataInstructions: "<b>Elevation data is the key input to generating a tsunami simulation.</b> Choose what elevation data will be used in the simulation. Then, order from highest quality to lowest (based on spatial resolution, quality and date) by dragging and dropping in layer pane on the left.",
     internalPolygonsInstructions: "<b>Optionally, create internal polygons</b> for areas of interest or to define areas with different mesh resolutions or mesh frictions.",
     internalPolygonsDrawButtonText: "Draw",
     internalPolygonsImportButtonText: "Import",
@@ -63,10 +64,51 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
      */
     simulationArea: null,
     
+    /** private: property[addDem]
+     *  ``gxp.plugins.AddLayers`` Tool for adding elevation models
+     */
+    addDem: null,
+    
+    /** private: property[demStore]
+     *  ``Ext.data.JsonStore`` data store or DEMs valid for the project
+     */
+    demStore: null,
+    
+    /** api: config[demSource]
+     *  ``String`` key of the local layer source that contains DEMs. Default
+     *  is "local".
+     */
+    demSource: "local",
+    
+    /** api: config[demLayerGroup]
+     *  ``String`` name of the Elevation Model group in the layer tree. Default
+     *  is "dem".
+     */
+    demLayerGroup: "dem",
+    
     /** private: property[projectId]
      *  ``Number`` project id, obtained after a POST to /tsudat/project/
      */
     projectId: null,
+    
+    constructor: function(config) {
+        TsuDat2.SimulationArea.superclass.constructor.apply(this, arguments);
+        
+        this.demStore = new Ext.data.JsonStore({
+            proxy: new Ext.data.HttpProxy({
+                method: "GET",
+                url: "/tsudat/data_set/",
+                disableCaching: false
+            }),
+            root: function(o) {
+                return o;
+            },
+            idProperty: "pk",
+            fields: [
+                {name: "typename", mapping: "fields.typename"}
+            ]
+        });
+    },
 
     init: function(target) {
         TsuDat2.SimulationArea.superclass.init.apply(this, arguments);
@@ -117,6 +159,48 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 {name: "id", type: "integer"},
                 "type"
             ]
+        });
+        
+        var origCreateLayerRecord;
+        this.addDem = new gxp.plugins.AddLayers({
+            actionTarget: this.id + "addDemTarget",
+            addActionTooltip: null,
+            addActionText: this.elevationDataAddButtonText,
+            instructionsText: this.elevationDataInstructions,
+            startSourceId: this.demSource,
+            outputConfig: {
+                modal: false,
+                listeners: {
+                    "show": function() {
+                        this.setOtherAddLayerButtonsDisabled(true);
+                        this.target.showTree();
+                        var demSource = this.target.layerSources[this.demSource];
+                        demSource.store.filterBy(function(rec) {
+                            return this.demStore.findExact("typename", rec.get("name")) != -1;
+                        }, this);
+                        origCreateLayerRecord = demSource.createLayerRecord;
+                        demSource.createLayerRecord = (function() {
+                            var rec = origCreateLayerRecord.apply(demSource, arguments);
+                            rec.set("group", this.demLayerGroup);
+                            return rec;
+                        }).createDelegate(this);
+                    },
+                    "hide": function() {
+                        this.setOtherAddLayerButtonsDisabled(false);
+                        var demSource = this.target.layerSources[this.demSource];
+                        demSource.store.clearFilter();
+                        demSource.createLayerRecord = origCreateLayerRecord;
+                    },
+                    scope: this
+                }
+            }
+        });
+        this.addDem.init(target);
+        
+        target.mapPanel.layers.on({
+            "add": this.checkValid,
+            "remove": this.checkValid,
+            scope: this
         });
     },
     
@@ -228,9 +312,22 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 cls: "composite-wrap",
                 fieldLabel: this.elevationDataLabel,
                 items: [{
-                    xtype: "button",
-                    iconCls: "icon-add",
-                    text: this.elevationDataAddButtonText
+                    id: this.id + "addDemTarget",
+                    xtype: "container",
+                    listeners: {
+                        "add": function(ct, cmp) {
+                            // start with "Add data" button disabled
+                            cmp.disable();
+                            cmp.on("enable", function() {
+                                // disable button again when we don't have a
+                                // projectId yet
+                                if (this.projectId == null) {
+                                    cmp.disable();
+                                }
+                            }, this);
+                        },
+                        scope: this
+                    }
                 }]
             }, {
                 xtype: "box",
@@ -439,8 +536,15 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                     } else {
                         this.projectId = result.id;
                         this.form.internalPolygons.enable();
-                        this.valid = true;
-                        this.target.fireEvent("valid", this, {projectId: result.id});
+                        this.demStore.load({
+                            params: {project_id: this.projectId},
+                            callback: function() {
+                                // enable "Add data" button
+                                this.addDem.actions[0].enable();
+                            },
+                            scope: this
+                        });
+                        this.checkValid();
                     }
                 }
                 // we didn't use a writer, so we remove all dirty marks
@@ -573,6 +677,32 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
         // everything except area of interest has a value
         if (this.internalPolygonType != 3) {
             e.feature.attributes.value = 0;
+        }
+    },
+    
+    checkValid: function() {
+        if (this.projectId) {
+            this.valid = false;
+            this.target.mapPanel.layers.each(function(rec) {
+                if (rec.get("group") == this.demLayerGroup) {
+                    this.valid = true;
+                    this.target.fireEvent("valid", this, {project_id: this.projectId});
+                    return false;
+                }
+            }, this);
+            if (this.valid == false) {
+                this.target.fireEvent("invalid", this);
+            }
+        }
+    },
+    
+    setOtherAddLayerButtonsDisabled: function(disabled) {
+        var tool;
+        for (var i in this.target.tools) {
+            tool = this.target.tools[i];
+            if (tool !== this && tool instanceof gxp.plugins.AddLayers) {
+                tool.actions[0].setDisabled(disabled);
+            }
         }
     }
 

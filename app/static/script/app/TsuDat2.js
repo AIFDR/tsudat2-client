@@ -69,7 +69,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 id: "east",
                 region: "east",
                 layout: "accordion",
-                width: 300,
+                width: 280,
                 split: true,
                 collapsible: true,
                 collapseMode: "mini",
@@ -116,6 +116,14 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         }, {
             ptype: "gxp_layertree",
             outputTarget: "west",
+            groups: {
+                "default": "Overlays (optional)",
+                "dem": "Elevation Models (required)",
+                "background": {
+                    title: "Base Layers",
+                    exclusive: true
+                }
+            },
             outputConfig: {
                 title: this.layersTabTitle,
                 id: "tree",
@@ -223,6 +231,12 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             }            
         }
         return completed;
+    },
+    
+    showTree: function() {
+        var westPanel = Ext.getCmp("west");
+        westPanel.expand();
+        westPanel.setActiveTab(0);
     }
 
 });
