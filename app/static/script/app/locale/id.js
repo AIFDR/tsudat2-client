@@ -1,7 +1,7 @@
 GeoExt.Lang.add("id", {
 
     "gxp.plugins.AddLayers.prototype": {
-        addMenuText: "Tambahkan layer",
+        addActionMenuText: "Tambahkan layer",
         addActionTip: "Tambahkan layer",
         addServerText: "Tambahkan server baru",
         untitledText: "Untitled",
