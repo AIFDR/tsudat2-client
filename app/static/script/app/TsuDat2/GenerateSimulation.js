@@ -116,6 +116,7 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
             xtype: "form",
             labelWidth: 95,
             monitorValid: true,
+            cls: "big-fbar",
             defaults: {
                 anchor: "100%"
             },
