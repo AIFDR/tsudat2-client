@@ -198,8 +198,8 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
         this.addDem.init(target);
         
         target.mapPanel.layers.on({
-            "add": this.checkValid,
-            "remove": this.checkValid,
+            "add": this.saveDems,
+            "remove": this.saveDems,
             scope: this
         });
     },
@@ -551,7 +551,6 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                             },
                             scope: this
                         });
-                        this.checkValid();
                     }
                 }
                 // we didn't use a writer, so we remove all dirty marks
@@ -687,27 +686,79 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
         }
     },
     
-    checkValid: function() {
-        if (this.projectId) {
-            this.valid = false;
-            this.target.mapPanel.layers.each(function(rec) {
-                if (rec.get("group") == this.demLayerGroup) {
-                    this.valid = true;
-                    this.target.fireEvent("valid", this, {project_id: this.projectId});
-                    return false;
-                }
-            }, this);
-            if (this.valid == false) {
-                this.target.fireEvent("invalid", this);
+    saveDems: function() {
+        this.valid = false;
+        this.target.fireEvent("invalid", this);
+        // TODO create this store only once, and do CRUD operations with an
+        // appropriate reader and writer
+        new Ext.data.JsonStore({
+            proxy: new Ext.data.HttpProxy({
+                method: "GET",
+                url: "/tsudat/project_data_set/",
+                baseParams: {
+                    project_id: this.projectId
+                },
+                disableCaching: false
+            }),
+            root: function(o) {
+                return o;
+            },
+            idProperty: "pk",
+            fields: [
+                {name: "typename", mapping: "fields.typename"}
+            ],
+            autoLoad: true,
+            listeners: {
+                "load": function(store, records) {
+                    // delete all existing project_data_sets
+                    var record;
+                    for (var i=records.length-1; i>=0; --i) {
+                        record = records[i];
+                        Ext.Ajax.request({
+                            method: "DELETE",
+                            url: "/tsudat/project_data_set/" + record.id + "/"
+                        });
+                    }
+                    // and now persist the new ones
+                    var ranking = 0, successful = 0;
+                    this.target.mapPanel.layers.each(function(rec) {
+                        if (rec.get("group") == this.demLayerGroup) {
+                            Ext.Ajax.request({
+                                method: "POST",
+                                url: "/tsudat/project_data_set/",
+                                jsonData: {
+                                    model: "tsudat.projectdataset",
+                                    fields: {
+                                        project: this.projectId,
+                                        ranking: ranking,
+                                        dataset: this.demStore.getAt(
+                                            this.demStore.findExact("typename", rec.get("name"))
+                                        ).id
+                                    }
+                                },
+                                success: function() {
+                                    successful++;
+                                    if (successful == ranking) {
+                                        this.valid = true;
+                                        this.target.fireEvent("valid", this, {project_id: this.projectId});
+                                    }
+                                },
+                                scope: this
+                            });
+                            ranking++;
+                        }
+                    }, this);
+                },
+                scope: this
             }
-        }
+        });
     },
     
     setOtherAddLayerButtonsDisabled: function(disabled) {
         var tool;
         for (var i in this.target.tools) {
             tool = this.target.tools[i];
-            if (tool !== this && tool instanceof gxp.plugins.AddLayers) {
+            if (tool !== this.addDem && tool instanceof gxp.plugins.AddLayers) {
                 tool.actions[0].setDisabled(disabled);
             }
         }
