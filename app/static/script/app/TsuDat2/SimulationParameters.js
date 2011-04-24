@@ -10,6 +10,9 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
     startTimeLabel: "Start time",
     endTimeLabel: "End time",
     smoothingLabel: "Smoothing",
+    modelSetupLabel: "Model Setup",
+    trialLabel: "Trial",
+    finalLabel: "Final",
     /** end i18n */
     
     ptype: "app_simulationparameters",
@@ -80,6 +83,20 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
                 anchor: null,
                 value: 0.00001,
                 allowBlank: false
+            }, {
+                xtype: "radiogroup",
+                fieldLabel: this.modelSetupLabel,
+                columns: 1,
+                items: [{
+                    xtype: "radio",
+                    name: "model_setup",
+                    boxLabel: this.trialLabel,
+                    checked: true
+                }, {
+                    xtype: "radio",
+                    name: "model_setup",
+                    boxLabel: this.finalLabel
+                }]
             }],
             listeners: {
                 "clientvalidation": function(fp, valid) {
