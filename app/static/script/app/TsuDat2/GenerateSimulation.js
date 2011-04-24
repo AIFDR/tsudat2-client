@@ -14,8 +14,6 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
     depthLabel: "Depth of the water (m)",
     stageLabel: "Stage, height of the water above MSL (m)",
     velocityLabel: "Velocity of the water (m/s)",
-    energyLabel: "Energy, a function of velocity and depth (kj)",
-    bedShearStressLabel: "Bed shear stress at base of water column",
     outputAsMaximumLabel: "Output the quantities above as the maximum value over the entire duration of the simulation.",
     gaugePointsInstructions: "<b>Optionally, draw gauge points</b> to create time series showing wave heights of the tsunami over the time of the simulation.",
     addGaugePointLabel: "Add gauge point",
