@@ -40,6 +40,7 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
                 fieldLabel: this.tideLabel,
                 items: [{
                     xtype: "numberfield",
+                    name: "initial_tidal_stage",
                     value: 1,
                     width: 60,
                     allowBlank: false
@@ -54,6 +55,7 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
                 fieldLabel: this.startTimeLabel,
                 items: [{
                     xtype: "numberfield",
+                    name: "start_time",
                     value: 0,
                     width: 60,
                     allowBlank: false
@@ -68,6 +70,7 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
                 fieldLabel: this.endTimeLabel,
                 items: [{
                     xtype: "numberfield",
+                    name: "end_time",
                     value: 1000000,
                     width: 60,
                     allowBlank: false
@@ -79,6 +82,7 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
             }, {
                 xtype: "numberfield",
                 fieldLabel: this.smoothingLabel,
+                name: "smoothing_param",
                 width: 60,
                 anchor: null,
                 value: 0.00001,
@@ -102,7 +106,13 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
                 "clientvalidation": function(fp, valid) {
                     if (valid !== this.valid) {
                         this.valid = valid;
-                        this.target.fireEvent(valid ? "valid" : "invalid", this);                            
+                        var data = this.form.getFormValues();
+                        data.model_setup = data.model_setup[0] ? "T" : "F";
+                        if (valid) {
+                            this.target.fireEvent("valid", this, data);
+                        } else {
+                            this.target.fireEvent("invalid", this);                            
+                        }
                     }
                 },
                 scope: this
