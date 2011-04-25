@@ -23,6 +23,10 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
     gaugePointRemoveActionTooltip: "Remove gauge point",
     saveSimulationText: "Save Simulation",
     generateSimulationText: "<b>Generate Simulation</b>",
+    savedTitle: "Scenario Saved",
+    savedMsg: "Scenario {0} saved successfully.",
+    savedTitle: "Scenario Queued",
+    savedMsg: "Scenario {0} queued for processing.",
     /** end i18n */
     
     ptype: "app_generatesimulation",
@@ -59,6 +63,11 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
      */
     valid: true,
     
+    /** private: property[scenario]
+     *  ``Object`` Scenario parameters gathered from all wizard steps
+     */
+    scenario: null,
+    
     init: function(target) {
         TsuDat2.GenerateSimulation.superclass.init.apply(this, arguments);
 
@@ -92,6 +101,14 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
             OpenLayers.Handler.Point
         );
         target.mapPanel.map.addControls([this.modifyControl, this.drawControl]);
+        
+        this.scenario = {};
+        this.target.on("valid", function(step, data) {
+            Ext.apply(this.scenario, data);
+            if (data && data.project) {
+                this.projectId = data.project;
+            }
+        }, this);
     },
 
     activate: function() {
@@ -122,7 +139,7 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
                 xtype: "textfield",
                 fieldLabel: this.scenarioNameLabel,
                 allowBlank: false,
-                ref: "scenarioName"
+                name: "name"
             }, {
                 xtype: "box",
                 autoEl: {
@@ -134,7 +151,8 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
                 xtype: "radio",
                 name: "area",
                 hideLabel: true,
-                boxLabel: this.simulationAreaLabel
+                boxLabel: this.simulationAreaLabel,
+                checked: true
             }, {
                 xtype: "radio",
                 name: "area",
@@ -148,6 +166,7 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
                     xtype: "numberfield",
                     value: 25,
                     width: 60,
+                    name: "raster_resolution",
                     allowBlank: false
                 }, {
                     xtype: "label",
@@ -162,33 +181,29 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
                 },
                 html: this.chooseLayersInstructions
             }, {
-                xtype: "checkbox",
-                ref: "depth",
+                xtype: "checkboxgroup",
+                name: "output_layers",
                 hideLabel: true,
-                boxLabel: this.depthLabel
+                columns: 1,
+                items: [{
+                    xtype: "checkbox",
+                    name: "depth",
+                    hideLabel: true,
+                    boxLabel: this.depthLabel
+                }, {
+                    xtype: "checkbox",
+                    name: "stage",
+                    hideLabel: true,
+                    boxLabel: this.stageLabel
+                }, {
+                    xtype: "checkbox",
+                    name: "velocity",
+                    hideLabel: true,
+                    boxLabel: this.velocityLabel
+                }]
             }, {
                 xtype: "checkbox",
-                ref: "stage",
-                hideLabel: true,
-                boxLabel: this.stageLabel
-            }, {
-                xtype: "checkbox",
-                ref: "velocity",
-                hideLabel: true,
-                boxLabel: this.velocityLabel
-            }, {
-                xtype: "checkbox",
-                ref: "energy",
-                hideLabel: true,
-                boxLabel: this.energyLabel
-            }, {
-                xtype: "checkbox",
-                ref: "bedShearStress",
-                hideLabel: true,
-                boxLabel: this.bedShearStressLabel
-            }, {
-                xtype: "checkbox",
-                ref: "outputAsMaximum",
+                name: "output_max",
                 hideLabel: true,
                 ctCls: "space-above",
                 boxLabel: this.outputAsMaximumLabel
@@ -268,14 +283,32 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
             fbar: new Ext.Toolbar({
                 items: [{
                     text: this.saveSimulationText,
+                    ref: "saveSimulation",
                     cls: "big-button",
-                    scale: "large"
+                    scale: "large",
+                    disabled: true,
+                    handler: this.saveScenario,
+                    scope: this
                 }, "->", {
                     text: this.generateSimulationText,
+                    ref: "generateSimulation",
                     cls: "big-button",
-                    scale: "large"
+                    scale: "large",
+                    disabled: true,
+                    handler: function() {
+                        this.saveScenario(true);
+                    },
+                    scope: this
                 }
-            ]})
+            ]}),
+            listeners: {
+                "clientvalidation": function(cmp, valid) {
+                    var fbar = this.form.getFooterToolbar();
+                    fbar.saveSimulation.setDisabled(!valid);
+                    fbar.generateSimulation.setDisabled(!valid);
+                },
+                scope: this
+            }
         }));
     },
     
@@ -339,8 +372,46 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
         e.feature.attributes.name = "";
         e.feature.attributes.elevation = 0;
         e.feature.attributes.project_id = this.projectId;
+    },
+    
+    saveScenario: function(run) {
+        var values = this.form.getForm().getFieldValues();
+        for (var i=values.output_layers.length-1; i>=0; --i) {
+            values.output_layers[i] = values.output_layers[i].name;
+        }
+        Ext.apply(values, this.scenario);
+        //TODO what to do with the area?
+        delete values.area;
+        //TODO to string or not to string?
+        /*
+        for (var i in values) {
+            if (!Ext.isArray(values[i])) {
+                values[i] = values[i].toString();
+            }
+        }
+        */
+        Ext.Ajax.request({
+            method: "POST",
+            url: "/tsudat/scenario/",
+            jsonData: values,
+            success: function(response) {
+                //TODO get the id of the created scenario from the response
+                var id;
+                if (run) {
+                    Ext.Ajax.request({
+                        method: "POST",
+                        url: "/tsudat/run_scenario/" + id + "/",
+                        success: function() {
+                            Ext.Mst.alert(this.queuedTitle, String.format(this.queuedMsg, id));
+                        }
+                    });
+                } else {
+                    Ext.Msg.alert(this.savedTitle, String.format(this.savedMsg, id));
+                }
+            }
+        });
     }
-
+    
 });
 
 Ext.preg(TsuDat2.GenerateSimulation.prototype.ptype, TsuDat2.GenerateSimulation);
