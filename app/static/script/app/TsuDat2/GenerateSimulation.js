@@ -25,8 +25,8 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
     generateSimulationText: "<b>Generate Simulation</b>",
     savedTitle: "Scenario Saved",
     savedMsg: "Scenario {0} saved successfully.",
-    savedTitle: "Scenario Queued",
-    savedMsg: "Scenario {0} queued for processing.",
+    queuedTitle: "Scenario Queued",
+    queuedMsg: "Scenario {0} queued for processing.",
     /** end i18n */
     
     ptype: "app_generatesimulation",
@@ -149,13 +149,13 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
                 html: this.areaResolutionInstructions
             }, {
                 xtype: "radio",
-                name: "area",
+                name: "use_aoi",
                 hideLabel: true,
                 boxLabel: this.simulationAreaLabel,
                 checked: true
             }, {
                 xtype: "radio",
-                name: "area",
+                name: "use_aoi",
                 hideLabel: true,
                 boxLabel: this.areaOfInterestLabel
             }, {
@@ -380,35 +380,31 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
             values.output_layers[i] = values.output_layers[i].name;
         }
         Ext.apply(values, this.scenario);
-        //TODO what to do with the area?
-        delete values.area;
-        //TODO to string or not to string?
-        /*
-        for (var i in values) {
-            if (!Ext.isArray(values[i])) {
-                values[i] = values[i].toString();
-            }
-        }
-        */
+        values.use_aoi = values.use_aoi[1];
+        //TODO raster resolution? mesh resolution?
         Ext.Ajax.request({
             method: "POST",
             url: "/tsudat/scenario/",
-            jsonData: values,
+            jsonData: {
+                model: "tsudat.scenario",
+                fields: values
+            },
             success: function(response) {
-                //TODO get the id of the created scenario from the response
-                var id;
-                if (run) {
+                var id = Ext.decode(response.responseText).id;
+                if (run === true) {
                     Ext.Ajax.request({
                         method: "POST",
                         url: "/tsudat/run_scenario/" + id + "/",
                         success: function() {
-                            Ext.Mst.alert(this.queuedTitle, String.format(this.queuedMsg, id));
-                        }
+                            Ext.Msg.alert(this.queuedTitle, String.format(this.queuedMsg, id));
+                        },
+                        scope: this
                     });
                 } else {
                     Ext.Msg.alert(this.savedTitle, String.format(this.savedMsg, id));
                 }
-            }
+            },
+            scope: this
         });
     }
     
