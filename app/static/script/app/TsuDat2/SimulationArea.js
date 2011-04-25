@@ -743,17 +743,18 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
             proxy: new Ext.data.HttpProxy({
                 method: "GET",
                 url: "/tsudat/project_data_set/",
-                baseParams: {
-                    project_id: this.projectId
-                },
                 disableCaching: false
             }),
+            baseParams: {
+                project_id: this.projectId
+            },
             root: function(o) {
                 return o;
             },
             idProperty: "pk",
             fields: [
-                {name: "typename", mapping: "fields.typename"}
+                {name: "typename", mapping: "fields.typename"},
+                {name: "project", mapping: "fields.project"}
             ],
             autoLoad: true,
             listeners: {
@@ -762,7 +763,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                     var record;
                     for (var i=records.length-1; i>=0; --i) {
                         record = records[i];
-                        Ext.Ajax.request({
+                        record.get("project") == this.projectId && Ext.Ajax.request({
                             method: "DELETE",
                             url: "/tsudat/project_data_set/" + record.id + "/"
                         });
