@@ -25,6 +25,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
     importProgress: "Uploading your {0}",
     importErrorTitle: "Error",
     importErrorMsg: "{0}: {1}",
+    uploadButtonText: "Upload",
     /** end i18n */
     
     ptype: "app_simulationarea",
@@ -343,14 +344,13 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 html: this.internalPolygonsInstructions
             }, {
                 xtype: "container",
-                ref: "internalPolygons",
                 layout: "hbox",
                 cls: "composite-wrap x-form-item",
-                disabled: true,
                 items: [{
                     xtype: "button",
                     ref: "../drawInternalPolygon",
                     iconCls: "icon-draw",
+                    disabled: true,
                     text: this.internalPolygonsDrawButtonText,
                     enableToggle: true,
                     toggleGroup: "draw",
@@ -372,7 +372,9 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                     cls: "composite"
                 }, {
                     xtype: "button",
+                    ref: "../importInternalPolygon",
                     iconCls: "icon-import",
+                    disabled: true,
                     text: this.internalPolygonsImportButtonText,
                     handler: function() {
                         this.vectorLayer.events.register("beforefeatureadded", this, function() {
@@ -543,7 +545,8 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                         feature.fid = result.id;
                     } else {
                         this.projectId = result.id;
-                        this.form.internalPolygons.enable();
+                        this.form.drawInternalPolygon.enable();
+                        this.form.importInternalPolygon.enable();
                         this.demStore.load({
                             params: {project_id: this.projectId},
                             callback: function() {
@@ -623,7 +626,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                     allowBlank: true
                 }],
                 buttons: [{
-                    text: "Upload",
+                    text: this.uploadButtonText,
                     ref: "../uploadButton",
                     disabled: true,
                     handler: function() {
@@ -705,17 +708,16 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 }
             }, this);
         }
+        var lastValid = this.valid;
         if (this._ready && valid && haveDems && this.projectId) {
             this.valid = true;
-            this._lastValid || this.target.fireEvent("valid", this, {
+            lastValid || this.target.fireEvent("valid", this, {
                 project: this.projectId,
                 default_friction_value: this.form.meshFriction.getValue()
             });
-            this._lastValid = true;
         } else {
             this.valid = false;
-            this._lastValid && this.target.fireEvent("invalid", this);
-            this._lastValid = false;
+            lastValid && this.target.fireEvent("invalid", this);
         }
     },
     
