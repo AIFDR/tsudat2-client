@@ -17,10 +17,8 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
     
     ptype: "app_simulationparameters",
     
-    valid: true,
-    
     addOutput: function(config) {
-        var output = (this.form = TsuDat2.SimulationParameters.superclass.addOutput.call(this, {
+        var output = TsuDat2.SimulationParameters.superclass.addOutput.call(this, {
             xtype: "form",
             labelWidth: 80,
             monitorValid: true,
@@ -89,25 +87,28 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
                 allowBlank: false
             }, {
                 xtype: "radiogroup",
+                name: "model_setup",
                 fieldLabel: this.modelSetupLabel,
                 columns: 1,
                 items: [{
                     xtype: "radio",
-                    name: "model_setup",
+                    name: "model_setup_value",
                     boxLabel: this.trialLabel,
-                    checked: true
+                    checked: true,
+                    value: "T"
                 }, {
                     xtype: "radio",
-                    name: "model_setup",
-                    boxLabel: this.finalLabel
+                    name: "model_setup_value",
+                    boxLabel: this.finalLabel,
+                    value: "F"
                 }]
             }],
             listeners: {
                 "clientvalidation": function(fp, valid) {
                     if (valid !== this.valid) {
                         this.valid = valid;
-                        var data = this.form.getFormValues();
-                        data.model_setup = data.model_setup[0] ? "T" : "F";
+                        var data = output.getForm().getFieldValues();
+                        data.model_setup = data.model_setup.value;
                         if (valid) {
                             this.target.fireEvent("valid", this, data);
                         } else {
@@ -117,7 +118,7 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
                 },
                 scope: this
             }
-        }));
+        });
         return output;
     }
     
