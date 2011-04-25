@@ -24,6 +24,11 @@ TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
     
     autoActivate: true,
     
+    /** private: property[hazardPoint]
+     *  ``OpenLayers.Feature.Vector``
+     */
+    hazardPoint: null,
+    
     /** api: config[symbolizer]
      *  ``Object`` Symbolizer for selected hazard points and sub-faults
      */
@@ -85,9 +90,6 @@ TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
                     cls: "x-form-item"
                 },
                 html: "<b>Define the scenario for the tsunami simulation.</b> First, select a hazard point from within the simulation area. Then, define the return period or wave height range."
-            }, {
-                xtype: "hidden",
-                ref: "hazardPoint"
             }, {
                 xtype: "textfield",
                 ref: "hazardPointCoords",
@@ -297,9 +299,10 @@ TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
                                 this.target.fireEvent("invalid", this);
                             } else {
                                 this.valid = true;
+                                var sz = this.form.sourceZone;
                                 this.target.fireEvent("valid", this, {
-                                    hazard_point: this.form.hazardPoint.getValue(),
-                                    source_zone: this.form.sourceZone.getValue(),
+                                    hazard_point: Number(this.hazardPoint.fid.split(".").pop()),
+                                    source_zone: sz.store.getAt(sz.store.findExact("source_zone", sz.getValue())).id,
                                     wave_height_delta: this.form.waveHeightDelta.getValue(),
                                     wave_height: this.form.waveHeight.getValue(),
                                     return_period: this.form.returnPeriod.getValue(),
@@ -364,7 +367,7 @@ TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
                 }
             },
             select: function(feature) {
-                this.parent.form.hazardPoint.setValue(feature.attributes.tsudat_id);
+                this.parent.hazardPoint = feature;
                 var geom = feature.geometry.clone().transform(
                     feature.layer.map.getProjectionObject(), epsg4326
                 );
@@ -433,7 +436,7 @@ TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
         if (!this.form) {
             return;
         }
-        var hp = this.form.hazardPoint.getValue(),
+        var hp = this.hazardPoint.attributes.tsudat_id,
             rp = this.form.returnPeriod.getValue();
         if (hp && rp) {
             Ext.Ajax.request({
@@ -456,7 +459,7 @@ TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
         if (!this.form) {
             return;
         }
-        var hp = this.form.hazardPoint.getValue(),
+        var hp = this.hazardPoint.attributes.tsudat_id,
             wh = this.form.waveHeight.getValue(),
             whd = this.form.waveHeightDelta.getValue();
         if (hp && wh && whd) {
@@ -481,7 +484,7 @@ TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
         if (!this.form) {
             return;
         }
-        var hp = this.form.hazardPoint.getValue(),
+        var hp = this.hazardPoint ? this.hazardPoint.attributes.tsudat_id : "",
             wh = this.form.waveHeight.getValue(),
             whd = this.form.waveHeightDelta.getValue(),
             sz = this.form.sourceZone.getValue(),
