@@ -222,6 +222,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
     addOutput: function(config) {
         var output = (this.form = TsuDat2.SimulationArea.superclass.addOutput.call(this, {
             xtype: "form",
+            monitorValid: true,
             labelWidth: 95,
             defaults: {
                 anchor: "100%"
@@ -288,6 +289,8 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 fieldLabel: this.meshResolutionLabel,
                 items: [{
                     xtype: "numberfield",
+                    ref: "../meshResolution",
+                    allowBlank: false,
                     value: 1000000,
                     minValue: 1,
                     maxValue: 1000000,
@@ -299,7 +302,9 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 }]
             }, {
                 fieldLabel: this.meshFrictionLabel,
+                ref: "meshFriction",
                 xtype: "numberfield",
+                allowBlank: false,
                 value: 0.0001,
                 width: 60,
                 minValue: 0.0001,
@@ -450,7 +455,11 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 }],
                 store: this.featureStore,
                 viewConfig: {forceFit: true}
-            }]
+            }],
+            listeners: {
+                "clientvalidation": this.checkValid,
+                scope: this
+            }
         }));
         
         this.vectorLayer.events.on({
@@ -522,8 +531,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 externalProjection: new OpenLayers.Projection("EPSG:4326")
             }).write(clone);
         }
-        this.valid = false;
-        this.target.fireEvent("invalid", this);
+        this._ready = false;
         Ext.Ajax.request({
             method: method,
             url: url,
@@ -539,6 +547,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                         this.demStore.load({
                             params: {project_id: this.projectId},
                             callback: function() {
+                                this._ready = true;
                                 // enable "Add data" button
                                 this.addDem.actions[0].enable();
                                 // remove DEM layers that are no longer valid
@@ -686,9 +695,46 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
         }
     },
     
-    saveDems: function() {
-        this.valid = false;
-        this.target.fireEvent("invalid", this);
+    checkValid: function(form, valid) {
+        if (valid) {
+            var haveDems = false;
+            this.target.mapPanel.layers.each(function(rec) {
+                if (rec.get("group") == this.demLayerGroup) {
+                    haveDems = true;
+                    return false;
+                }
+            }, this);
+        }
+        if (this._ready && valid && haveDems && this.projectId) {
+            this.valid = true;
+            this._lastValid || this.target.fireEvent("valid", this, {
+                project: this.projectId,
+                default_friction_value: this.form.meshFriction.getValue()
+            });
+            this._lastValid = true;
+        } else {
+            this.valid = false;
+            this._lastValid && this.target.fireEvent("invalid", this);
+            this._lastValid = false;
+        }
+    },
+    
+    saveDems: function(store, records) {
+        if (!Ext.isArray(records)) {
+            records = [records];
+        }
+        var haveDems = false;
+        for (var i=records.length-1; i>=0; --i) {
+            if (records[i].get("group") == this.demLayerGroup) {
+                haveDems = true;
+                break;
+            }
+        }
+        if (!haveDems) {
+            return;
+        }
+        
+        this._ready = false;
         // TODO create this store only once, and do CRUD operations with an
         // appropriate reader and writer
         new Ext.data.JsonStore({
@@ -739,8 +785,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                                 success: function() {
                                     successful++;
                                     if (successful == ranking) {
-                                        this.valid = true;
-                                        this.target.fireEvent("valid", this, {project_id: this.projectId});
+                                        this._ready = true;
                                     }
                                 },
                                 scope: this
