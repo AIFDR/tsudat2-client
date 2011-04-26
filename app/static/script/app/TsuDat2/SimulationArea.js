@@ -533,12 +533,13 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 externalProjection: new OpenLayers.Projection("EPSG:4326")
             }).write(clone);
         }
-        this._ready = false;
+        this._working = true;
         Ext.Ajax.request({
             method: method,
             url: url,
             jsonData: json,
             success: function(request) {
+                delete this._working;
                 var result = Ext.decode(request.responseText);
                 if (result.id) {
                     if (isInternalPolygon) {
@@ -550,7 +551,6 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                         this.demStore.load({
                             params: {project_id: this.projectId},
                             callback: function() {
-                                this._ready = true;
                                 // enable "Add data" button
                                 this.addDem.actions[0].enable();
                                 // remove DEM layers that are no longer valid
@@ -713,7 +713,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
             }, this);
         }
         var lastValid = this.valid;
-        if (this._ready && valid && haveDems && this.projectId) {
+        if (!this._working && valid && haveDems && this.projectId) {
             this.valid = true;
             lastValid || this.target.fireEvent("valid", this, {
                 project: this.projectId,
@@ -740,7 +740,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
             return;
         }
         
-        this._ready = false;
+        this._working = true;
         // TODO create this store only once, and do CRUD operations with an
         // appropriate reader and writer
         new Ext.data.JsonStore({
@@ -792,7 +792,7 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                                 success: function() {
                                     successful++;
                                     if (successful == ranking) {
-                                        this._ready = true;
+                                        delete this._working;
                                     }
                                 },
                                 scope: this
