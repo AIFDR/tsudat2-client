@@ -637,6 +637,10 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                             url: "/tsudat/polygon_from_csv/",
                             waitMsg: String.format(this.importProgress, humanReadableType),
                             success: function(form, action) {
+                                var features = this.vectorLayer.features;
+                                for (var i=features.length-1; i>=0; --i) {
+                                    features[i].attributes.project_id === undefined || this.vectorLayer.removeFeatures([features[i]]);
+                                }
                                 this.vectorLayer.addFeatures(action.result.features);
                                 this.vectorLayer.map.zoomToExtent(action.result.features[0].geometry.getBounds());
                                 uploadWindow.close();
