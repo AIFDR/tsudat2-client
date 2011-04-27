@@ -26,6 +26,8 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
     importErrorTitle: "Error",
     importErrorMsg: "{0}: {1}",
     uploadButtonText: "Upload",
+    uploadFileLabel: "CSV file",
+    uploadCrsLabel: "CRS",
     /** end i18n */
     
     ptype: "app_simulationarea",
@@ -616,13 +618,13 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
                 }, {
                     xtype: "fileuploadfield",
                     name: "csv_file",
-                    fieldLabel: "CSV file",
+                    fieldLabel: this.uploadFileLabel,
                     allowBlank: false
                 }, {
                     xtype: "textfield",
                     ref: "crs",
                     name: "srs",
-                    fieldLabel: "CRS",
+                    fieldLabel: this.uploadCrsLabel,
                     allowBlank: true
                 }],
                 buttons: [{
