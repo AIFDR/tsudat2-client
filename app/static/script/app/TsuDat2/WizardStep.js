@@ -25,12 +25,12 @@ TsuDat2.WizardStep = Ext.extend(gxp.plugins.Tool, {
             ct.setDisabled(this.index != 0);
             this.target.on({
                 "valid": function(plugin) {
-                    if (this.target.previousStepsCompleted(this)) {
+                    if (this.previousStepsCompleted(this)) {
                         ct.enable();
                     }
                 },
                 "invalid": function(plugin) {
-                    if (!this.target.previousStepsCompleted(this)) {
+                    if (!this.previousStepsCompleted(this)) {
                         ct.disable();
                     }
                 },
@@ -43,6 +43,20 @@ TsuDat2.WizardStep = Ext.extend(gxp.plugins.Tool, {
             });
         }, this);
         return TsuDat2.WizardStep.superclass.addOutput.call(this, output);
+    },
+
+    previousStepsCompleted: function(plugin) {
+        var index = plugin.index, completed = true;
+        if (index > 0) {
+            var tool;
+            for (var i in this.target.tools) {
+                tool = this.target.tools[i];
+                if (tool instanceof TsuDat2.WizardStep && tool.index < index) {
+                    completed = completed && tool.valid;
+                }
+            }            
+        }
+        return completed;
     }
 
 });

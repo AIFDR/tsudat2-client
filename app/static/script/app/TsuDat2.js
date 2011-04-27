@@ -218,21 +218,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         });
 
     },
-    
-    previousStepsCompleted: function(plugin) {
-        var index = plugin.index, completed = true;
-        if (index > 0) {
-            var tool;
-            for (var i in this.tools) {
-                tool = this.tools[i];
-                if (tool instanceof TsuDat2.WizardStep && tool.index < index) {
-                    completed = completed && tool.valid;
-                }
-            }            
-        }
-        return completed;
-    },
-    
+        
     showTree: function() {
         var westPanel = Ext.getCmp("west");
         westPanel.expand();
