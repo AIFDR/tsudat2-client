@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2011 The Open Planning Project
+ */
+
 Ext.BLANK_IMAGE_URL = "theme/app/img/blank.gif";
 OpenLayers.DOTS_PER_INCH = 25.4 / 0.28;
 // the only resource we need from OpenLayers.ImgPath is blank.gif, and we take
@@ -94,7 +98,10 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 }, {
                     id: "step4",
                     title: this.step4Title
-                }]
+                }],
+                plugins: {
+                    ptype: "gxp_wizardcontainer"
+                }
             },
             "map"]
         }];

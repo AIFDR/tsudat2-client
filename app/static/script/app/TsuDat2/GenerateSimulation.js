@@ -1,8 +1,8 @@
 /*
- * @require TsuDat2/WizardStep.js
+ * @require TsuDat2.js
  */
 
-TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
+TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     
     /** i18n */
     scenarioNameLabel: "Scenario Name",
@@ -53,20 +53,10 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
      */
     drawControl: null,
     
-    /** private: property[projectId]
-     *  ``Number`` project id, obtained after a POST to /tsudat/project/
-     */
-    projectId: null,
-
     /** private: property[valid]
      *  ``Boolean`` Is the form currently valid?
      */
     valid: true,
-    
-    /** private: property[scenario]
-     *  ``Object`` Scenario parameters gathered from all wizard steps
-     */
-    scenario: null,
     
     init: function(target) {
         TsuDat2.GenerateSimulation.superclass.init.apply(this, arguments);
@@ -101,14 +91,6 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
             OpenLayers.Handler.Point
         );
         target.mapPanel.map.addControls([this.modifyControl, this.drawControl]);
-        
-        this.scenario = {};
-        this.target.on("valid", function(step, data) {
-            Ext.apply(this.scenario, data);
-            if (data && data.project) {
-                this.projectId = data.project;
-            }
-        }, this);
     },
 
     activate: function() {
@@ -371,7 +353,7 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
     setGaugePointAttributes: function(e) {
         e.feature.attributes.name = "";
         e.feature.attributes.elevation = 0;
-        e.feature.attributes.project_id = this.projectId;
+        e.feature.attributes.project_id = this.wizardData.project;
     },
     
     saveScenario: function(run) {
@@ -379,7 +361,7 @@ TsuDat2.GenerateSimulation = Ext.extend(TsuDat2.WizardStep, {
         for (var i=values.output_layers.length-1; i>=0; --i) {
             values.output_layers[i] = values.output_layers[i].name;
         }
-        Ext.apply(values, this.scenario);
+        Ext.apply(values, this.wizardData);
         values.use_aoi = values.use_aoi[1];
         //TODO raster resolution? mesh resolution?
         Ext.Ajax.request({

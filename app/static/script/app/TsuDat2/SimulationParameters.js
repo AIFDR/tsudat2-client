@@ -1,8 +1,8 @@
 /*
- * @require TsuDat2/WizardStep.js
+ * @require TsuDat2.js
  */
 
-TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
+TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
     
     /** i18n */
     defineParametersInstructions: "<b>Define parameters for the simulation.</b> These include tide, duration, etc.",
@@ -106,14 +106,9 @@ TsuDat2.SimulationParameters = Ext.extend(TsuDat2.WizardStep, {
             listeners: {
                 "clientvalidation": function(fp, valid) {
                     if (valid !== this.valid) {
-                        this.valid = valid;
                         var data = output.getForm().getFieldValues();
                         data.model_setup = data.model_setup.value;
-                        if (valid) {
-                            this.target.fireEvent("valid", this, data);
-                        } else {
-                            this.target.fireEvent("invalid", this);                            
-                        }
+                        this.setValid(valid, data);
                     }
                 },
                 scope: this

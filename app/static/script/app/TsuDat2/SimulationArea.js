@@ -1,8 +1,8 @@
 /*
- * @require TsuDat2/WizardStep.js
+ * @require TsuDat2.js
  */
 
-TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
+TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     
     /** i18n */
     simulationAreaInstructions: "<b>Define the area for the tsunami simulation.</b> Draw or upload the area over which to run the simulation, add and rank elevetion data, then define the default mesh resolution.",
@@ -716,14 +716,12 @@ TsuDat2.SimulationArea = Ext.extend(TsuDat2.WizardStep, {
         }
         var lastValid = this.valid;
         if (!this._working && valid && haveDems && this.projectId) {
-            this.valid = true;
-            lastValid || this.target.fireEvent("valid", this, {
+            lastValid || this.setValid(true, {
                 project: this.projectId,
                 default_friction_value: this.form.meshFriction.getValue()
             });
         } else {
-            this.valid = false;
-            lastValid && this.target.fireEvent("invalid", this);
+            lastValid && this.setValid(false);
         }
     },
     

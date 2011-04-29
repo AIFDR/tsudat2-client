@@ -1,8 +1,8 @@
 /*
- * @require TsuDat2/WizardStep.js
+ * @require TsuDat2.js
  */
 
-TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
+TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
     
     /** i18n */
     hazardPointLabel: "Hazard Point",
@@ -295,12 +295,10 @@ TsuDat2.Scenario = Ext.extend(TsuDat2.WizardStep, {
                     listeners: {
                         "selectionchange": function(sm) {
                             if (sm.getCount() == 0) {
-                                this.valid = false;
-                                this.target.fireEvent("invalid", this);
+                                this.setValid(false);
                             } else {
-                                this.valid = true;
                                 var sz = this.form.sourceZone;
-                                this.target.fireEvent("valid", this, {
+                                this.setValid(true, {
                                     hazard_point: Number(this.hazardPoint.fid.split(".").pop()),
                                     source_zone: sz.store.getAt(sz.store.findExact("source_zone", sz.getValue())).id,
                                     wave_height_delta: this.form.waveHeightDelta.getValue(),
