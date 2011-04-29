@@ -22,7 +22,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     gaugePointUnitHeader: "Unit",
     gaugePointRemoveActionTooltip: "Remove gauge point",
     saveSimulationText: "Save Simulation",
-    generateSimulationText: "<b>Generate Simulation</b>",
+    generateSimulationText: "<b>Run Simulation</b>",
     savedTitle: "Scenario Saved",
     savedMsg: "Scenario {0} saved successfully.",
     queuedTitle: "Scenario Queued",
@@ -53,10 +53,10 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
      */
     drawControl: null,
     
-    /** private: property[valid]
-     *  ``Boolean`` Is the form currently valid?
+    /** api: property[scenarioId]
+     *  ``Number`` The id of the current scenario
      */
-    valid: true,
+    scenarioId: null,
     
     init: function(target) {
         TsuDat2.GenerateSimulation.superclass.init.apply(this, arguments);
@@ -277,9 +277,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                     cls: "big-button",
                     scale: "large",
                     disabled: true,
-                    handler: function() {
-                        this.saveScenario(true);
-                    },
+                    handler: this.runScenario,
                     scope: this
                 }
             ]}),
@@ -287,7 +285,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                 "clientvalidation": function(cmp, valid) {
                     var fbar = this.form.getFooterToolbar();
                     fbar.saveSimulation.setDisabled(!valid);
-                    fbar.generateSimulation.setDisabled(!valid);
+                    fbar.generateSimulation.setDisabled(!(valid && this.scenarioId));
                 },
                 scope: this
             }
@@ -356,7 +354,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
         e.feature.attributes.project_id = this.wizardData.project;
     },
     
-    saveScenario: function(run) {
+    saveScenario: function() {
         var values = this.form.getForm().getFieldValues();
         for (var i=values.output_layers.length-1; i>=0; --i) {
             values.output_layers[i] = values.output_layers[i].name;
@@ -365,26 +363,29 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
         values.use_aoi = values.use_aoi[1];
         //TODO raster resolution? mesh resolution?
         Ext.Ajax.request({
-            method: "POST",
-            url: "/tsudat/scenario/",
+            method: this.scenarioId ? "PUT" : "POST",
+            url: this.scenarioId ? "/tsudat/scenario/" + this.scenarioId + "/" : "/tsudat/scenario/",
             jsonData: {
                 model: "tsudat.scenario",
                 fields: values
             },
             success: function(response) {
-                var id = Ext.decode(response.responseText).id;
-                if (run === true) {
-                    Ext.Ajax.request({
-                        method: "POST",
-                        url: "/tsudat/run_scenario/" + id + "/",
-                        success: function() {
-                            Ext.Msg.alert(this.queuedTitle, String.format(this.queuedMsg, id));
-                        },
-                        scope: this
-                    });
-                } else {
-                    Ext.Msg.alert(this.savedTitle, String.format(this.savedMsg, id));
+                if (!this.scenarioId) {
+                    this.scenarioId = Ext.decode(response.responseText).id;
                 }
+                Ext.Msg.alert(this.savedTitle, String.format(this.savedMsg, this.scenarioId));
+            },
+            scope: this
+        });
+    },
+    
+    runScenario: function() {
+        Ext.Ajax.request({
+            method: "POST",
+            url: "/tsudat/run_scenario/" + this.scenarioId + "/",
+            success: function() {
+                Ext.Msg.alert(this.queuedTitle, String.format(this.queuedMsg, this.scenarioId));
+                this.scenarioId = null;
             },
             scope: this
         });
