@@ -60,6 +60,9 @@
                     google: {
                         ptype: "gxp_googlesource"
                     },
+                    osm: {
+                        ptype: "gxp_osmsource"
+                    },
                     ol: {
                         ptype: "gxp_olsource"
                     }
@@ -94,6 +97,13 @@
                         title: "Google Aerial",
                         name: "SATELLITE",
                         group: "background",
+                        visibility: false,
+                        fixed: true
+                    }, {
+                        source: "osm",
+                        title: "OpenStreetMap",
+                        group: "background",
+                        name: "mapnik",
                         visibility: false,
                         fixed: true
                     }, {
