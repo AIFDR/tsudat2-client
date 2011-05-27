@@ -206,26 +206,110 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         Ext.data.Connection.on({
             "requestexception": function(conn, response, options) {
                 if (response.status && !options.failure) {
-                    var msg;
-                    try {
-                        var result = Ext.decode(response.responseText);
-                        msg = String.format(this.errorMsg, result.msg, result.reason);
-                    } catch(e) {
-                        msg = String.format(this.unknownErrorMsg,
-                            response.status, response.statusText
-                        );
+                    if (response.status == 401 && url.indexOf("/" == 0)) {
+                        this.login(options);
+                    } else {
+                        this.displayXHRTrouble(response);
                     }
-                    Ext.Msg.show({
-                        title: this.errorTitle,
-                        msg: msg,
-                        icon: Ext.MessageBox.ERROR,
-                        buttons: {ok: true}
-                    });
                 }
             },
             scope: this
         });
 
+    },
+    
+    login: function(options) {
+        var submit = function() {
+            form.getForm().submit({
+                waitMsg: "Logging in...",
+                success: function(form, action) {
+                    win.close();
+                    document.cookie = action.response.getResponseHeader("Set-Cookie");
+                    // resend the original request
+                    Ext.Ajax.request(options);
+                },
+                failure: function(form, action) {
+                    var username = form.items.get(0);
+                    var password = form.items.get(1);
+                    username.markInvalid();
+                    password.markInvalid();
+                    username.focus(true);
+                },
+                scope: this
+            });
+        }.bind(this);
+        var win = new Ext.Window({
+            title: "GeoNode Login",
+            modal: true,
+            width: 230,
+            autoHeight: true,
+            layout: "fit",
+            items: [{
+                xtype: "form",
+                autoHeight: true,
+                labelWidth: 55,
+                border: false,
+                bodyStyle: "padding: 10px;",
+                url: "/accounts/ajax_login",
+                waitMsgTarget: true,
+                errorReader: {
+                    // teach ExtJS a bit of RESTfulness
+                    read: function(response) {
+                        return {
+                            success: response.status == 200,
+                            records: []
+                        };
+                    }
+                },
+                defaults: {
+                    anchor: "100%"
+                },
+                items: [{
+                    xtype: "textfield",
+                    name: "username",
+                    fieldLabel: "Username"
+                }, {
+                    xtype: "textfield",
+                    name: "password",
+                    fieldLabel: "Password",
+                    inputType: "password"
+                }, /*{
+                    xtype: "hidden",
+                    name: "csrfmiddlewaretoken",
+                    value: this.csrfToken
+                }, */{
+                    xtype: "button",
+                    text: "Login",
+                    inputType: "submit",
+                    handler: submit
+                }]
+            }],
+            keys: {
+                "key": Ext.EventObject.ENTER,
+                "fn": submit
+            }
+        });
+        win.show();
+        var form = win.items.get(0);
+        form.items.get(0).focus(false, 100);
+    },
+
+    displayXHRTrouble: function(response) {
+        var msg;
+        try {
+            var result = Ext.decode(response.responseText);
+            msg = String.format(this.errorMsg, result.msg, result.reason);
+        } catch(e) {
+            msg = String.format(this.unknownErrorMsg,
+                response.status, response.statusText
+            );
+        }
+        Ext.Msg.show({
+            title: this.errorTitle,
+            msg: msg,
+            icon: Ext.MessageBox.ERROR,
+            buttons: {ok: true}
+        });
     },
         
     showTree: function() {
