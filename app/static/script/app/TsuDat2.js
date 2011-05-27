@@ -51,9 +51,12 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             tbar: {
                 id: "paneltbar",
                 items: [{
-                    iconCls: "icon-geoexplorer",
-                    disabled: true
-                }, "TsuDat2", "-", "-"]
+                    iconCls: "icon-geonode",
+                    text: "&nbsp;TsuDat2",
+                    handler: function() {
+                        window.location.href = "/";
+                    }
+                }, "-", "-"]
             },
             items: [{
                 xtype: "tabpanel",
@@ -110,17 +113,17 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             ptype: "gxp_zoomtoextent",
             extent: config.map.extent,
             closest: false,
-            actionTarget: {target: "paneltbar", index: 3}
+            actionTarget: {target: "paneltbar", index: 2}
         }, {
             ptype: "gxp_navigationhistory",
-            actionTarget: {target: "paneltbar", index: 4}
+            actionTarget: {target: "paneltbar", index: 3}
         }, {
             ptype: "gxp_measure",
-            actionTarget: {target: "paneltbar", index: 6},
+            actionTarget: {target: "paneltbar", index: 5},
             toggleGroup: "main"
         }, {
             ptype: "gxp_wmsgetfeatureinfo",
-            actionTarget: {target: "paneltbar", index: 7},
+            actionTarget: {target: "paneltbar", index: 6},
             toggleGroup: "main"
         }, {
             ptype: "gxp_layertree",
