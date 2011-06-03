@@ -54,6 +54,12 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
     init: function(target) {
         this.initHazardPointManagement(target);
         this.initSubfaultManagement(target);
+        
+        target.mapPanel.map.events.register("addlayer", this, function(evt) {
+            if (this.setReturnPeriodFilter(this.form.returnPeriod.getValue())) {
+                target.mapPanel.map.events.unregister("addlayer", this, arguments.callee);
+            }
+        });
 
         TsuDat2.Scenario.superclass.init.apply(this, arguments);
     },
@@ -434,7 +440,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
         if (!this.form) {
             return;
         }
-        var hp = this.hazardPoint.attributes.tsudat_id,
+        var hp = this.hazardPoint && this.hazardPoint.attributes.tsudat_id,
             rp = this.form.returnPeriod.getValue();
         if (hp && rp) {
             Ext.Ajax.request({
@@ -472,12 +478,50 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 success: function(response) {
                     var result = Ext.decode(response.responseText)[0];
                     this.form.returnPeriod.setValue(result.fields.return_period);
+                    this.setReturnPeriodFilter(result.fields.return_period, hp);
                 },
                 scope: this
             });
         }
     },
     
+    setReturnPeriodFilter: function(returnPeriod, hazardPoint) {
+        var hpRec;
+        if (returnPeriod) {
+            hpRec = this.target.getLayerRecordFromMap({
+                name: "tsudat:tsudat_hazardpoint",
+                source: "local"
+            });
+            if (hpRec) {
+                var filter = "return_period=" + returnPeriod;
+                var hpLayer = hpRec.getLayer();
+                if (hpLayer.params.CQL_FILTER != filter) {
+                    hpLayer.mergeNewParams({
+                        layers: "tsudat:tsudat_hazardpoint_rp",
+                        styles: "tsudat_hazard_point_rp",
+                        cql_filter: filter
+                    });
+                }
+            }
+            if (hazardPoint) {
+                sfRec = this.target.getLayerRecordFromMap({
+                    name: "tsudat:tsudat_subfault",
+                    source: "local"
+                });
+                filter += " AND hazardpoint_tsudat_id=" + hazardPoint;
+                var sfLayer = sfRec.getLayer();
+                if (sfLayer.params.CQL_FILTER != filter) {
+                    sfLayer.mergeNewParams({
+                        layers: "tsudat:tsudat_subfault_contribution",
+                        styles: "tsudat_subfault_contribution",
+                        cql_filter: filter
+                    });
+                }
+            }
+        }
+        return !!hpRec;
+    },
+        
     updateEventGrid: function() {
         if (!this.form) {
             return;

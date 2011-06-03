@@ -24,7 +24,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
     unknownErrorMsg: "The server returned an error: {0} {1}",
     /** end i18n */
 
-    defaultSourceType: "gxp_wmssource",
+    defaultSourceType: "gxp_wmscsource",
     
     constructor: function(config) {
                 
