@@ -209,7 +209,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         Ext.data.Connection.on({
             "requestexception": function(conn, response, options) {
                 if (response.status && !options.failure) {
-                    if (response.status == 401 && url.indexOf("/" == 0)) {
+                    if (response.status == 401 && options.url.indexOf("/" == 0)) {
                         this.login(options);
                     } else {
                         this.displayXHRTrouble(response);
