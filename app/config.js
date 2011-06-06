@@ -25,7 +25,7 @@ if (java.lang.System.getProperty("app.debug")) {
         );
     }
 
-    // proxy a remote tsudat app on /tsudat by setting proxy.server to remote URL
+    // proxy a remote tsudat app on /tsudat by setting proxy.tsudat to remote URL
     // only recommended for debug mode
     var tsudat = java.lang.System.getProperty("app.proxy.tsudat");
     if (tsudat) {
@@ -37,6 +37,24 @@ if (java.lang.System.getProperty("app.debug")) {
             [(/^\/tsudat\/(.*)/), require("./proxy").pass({url: tsudat, preserveHost: true})]
         );
     }
+
+    // proxy a remote geonode on / by setting proxy.geonode to remote URL
+    // only recommended for debug mode
+    var geonode = java.lang.System.getProperty("app.proxy.geonode");
+    if (geonode) {
+        if (geonode.charAt(geonode.length-1) !== "/") {
+            geonode = geonode + "/";
+        }
+        var geonodeUrls = ["data/acls", "accounts/"];
+        var url;
+        for (var i=geonodeUrls.length-1; i>=0; --i) {
+            url = geonodeUrls[i];
+            urls.push(
+                [new RegExp("^\\/" + url.replace("/", "\\/") + "(.*)"), require("./proxy").pass({url: geonode + url, preserveHost: true})]
+            );
+        }        
+    }
+
 }
 
 exports.urls = urls;
