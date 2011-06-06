@@ -278,10 +278,12 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 }, {
                     xtype: "button",
                     iconCls: "icon-import",
+                    toggleGroup: "draw",
+                    allowDepress: true,
                     text: this.simulationAreaImportButtonText,
-                    handler: function() {
+                    handler: function(btn) {
                         this.vectorLayer.events.registerPriority("featureadded", this, this.setSimulationArea);
-                        this.showUploadWindow();
+                        this.showUploadWindow(btn);
                     },
                     scope: this
                 }]
@@ -376,14 +378,16 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                     xtype: "button",
                     ref: "../importInternalPolygon",
                     iconCls: "icon-import",
+                    toggleGroup: "draw",
+                    allowDepress: true,
                     disabled: true,
                     text: this.internalPolygonsImportButtonText,
-                    handler: function() {
+                    handler: function(btn) {
                         this.vectorLayer.events.register("beforefeatureadded", this, function() {
                             this.vectorLayer.events.unregister("beforefeatureadded", this, arguments.callee);
                             this.setInternalPolygonAttributes.apply(this, arguments);
                         });
-                        this.showUploadWindow(this.internalPolygonType);
+                        this.showUploadWindow(btn, this.internalPolygonType);
                     },
                     scope: this
                 }, {
@@ -577,7 +581,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         });
     },
     
-    showUploadWindow: function(type) {
+    showUploadWindow: function(sourceButton, type) {
         var isInternalPolygon = (type != null),
             humanReadableType;
         if (isInternalPolygon) {
@@ -639,9 +643,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                             url: "/tsudat/polygon_from_csv/",
                             waitMsg: String.format(this.importProgress, humanReadableType),
                             success: function(form, action) {
-                                var features = this.vectorLayer.features;
-                                for (var i=features.length-1; i>=0; --i) {
-                                    features[i].attributes.project_id === undefined || this.vectorLayer.removeFeatures([features[i]]);
+                                if (!type) {
+                                    var features = this.vectorLayer.features;
+                                    for (var i=features.length-1; i>=0; --i) {
+                                        features[i].attributes.project_id === undefined || this.vectorLayer.removeFeatures([features[i]]);
+                                    }
                                 }
                                 this.vectorLayer.addFeatures(action.result.features);
                                 this.vectorLayer.map.zoomToExtent(action.result.features[0].geometry.getBounds());
@@ -682,7 +688,12 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                         }
                     }
                 }
-            }]
+            }],
+            listeners: {
+                close: function() {
+                    sourceButton.toggle(false);
+                }
+            }
         });
         uploadWindow.show();
     },
