@@ -276,11 +276,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                     name: "password",
                     fieldLabel: "Password",
                     inputType: "password"
-                }, /*{
-                    xtype: "hidden",
-                    name: "csrfmiddlewaretoken",
-                    value: this.csrfToken
-                }, */{
+                }, {
                     xtype: "button",
                     text: "Login",
                     inputType: "submit",
