@@ -227,7 +227,6 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 waitMsg: "Logging in...",
                 success: function(form, action) {
                     win.close();
-                    document.cookie = action.response.getResponseHeader("Set-Cookie");
                     // resend the original request
                     Ext.Ajax.request(options);
                 },
