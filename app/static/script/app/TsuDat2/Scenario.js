@@ -61,12 +61,6 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
         this.initHazardPointManagement(target);
         this.initSubfaultManagement(target);
         
-        target.mapPanel.map.events.register("addlayer", this, function(evt) {
-            if (this.setReturnPeriodFilter(this.form.returnPeriod.getValue())) {
-                target.mapPanel.map.events.unregister("addlayer", this, arguments.callee);
-            }
-        });
-
         target.tools[this.eventHighlighter].showLayer();
 
         TsuDat2.Scenario.superclass.init.apply(this, arguments);
@@ -145,7 +139,15 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                             "load": {
                                 fn: function(store) {
                                     var rpField = this.form.returnPeriod;
-                                    rpField.setValue(store.getAt(0).get(rpField.valueField));
+                                    var returnPeriod = store.getAt(0).get(rpField.valueField);
+                                    rpField.setValue(returnPeriod);
+                                    if (!this.setReturnPeriodFilter(returnPeriod)) {
+                                        this.target.mapPanel.map.events.register("addlayer", this, function(evt) {
+                                            if (this.setReturnPeriodFilter(returnPeriod)) {
+                                                this.target.mapPanel.map.events.unregister("addlayer", this, arguments.callee);
+                                            }
+                                        });
+                                    }
                                 },
                                 single: true
                             },
