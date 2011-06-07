@@ -3,7 +3,7 @@
  */
 
 Ext.BLANK_IMAGE_URL = "theme/app/img/blank.gif";
-OpenLayers.DOTS_PER_INCH = 25.4 / 0.28;
+OpenLayers.IMAGE_RELOAD_ATTEMPTS = 10;
 // the only resource we need from OpenLayers.ImgPath is blank.gif, and we take
 // this from the theme.
 OpenLayers.ImgPath = "externals/openlayers/theme/default/img/";
@@ -226,7 +226,13 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         Ext.util.Observable.observeClass(Ext.data.Connection);
         Ext.data.Connection.on({
             "requestexception": function(conn, response, options) {
-                if (response.status && !options.failure) {
+                var attempts = options.attempts || 0;
+                if (response.status == 500 && attempts <= 10) {
+                    options.attempts = ++attempts;
+                    window.setTimeout(function() {
+                        Ext.Ajax.request(options);
+                    }, 250);
+                } else if (response.status && !options.failure) {
                     if (response.status == 401 && options.url.indexOf("/" == 0)) {
                         this.login(options);
                     } else {
