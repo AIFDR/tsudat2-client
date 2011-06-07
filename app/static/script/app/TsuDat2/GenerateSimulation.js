@@ -11,7 +11,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     areaOfInterestLabel: "Area of Interest",
     rasterResolutionLabel: "Raster resolution",
     chooseLayersInstructions: "<b>Choose layers to create from the simulation:</b>",
-    depthLabel: "Depth of the water (m)",
+    depthLabel: "Flow depth of water onland (m)",
     stageLabel: "Stage, height of the water above MSL (m)",
     velocityLabel: "Velocity of the water (m/s)",
     outputAsMaximumLabel: "Output the quantities above as the maximum value over the entire duration of the simulation.",
