@@ -164,6 +164,13 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             format: "JSON",
             maxFeatures: 250,
             paging: false,
+            symbolizer: {
+                graphicName: "circle",
+                pointRadius: 5,
+                fillOpacity: 0.5,
+                fillColor: "#FFFFFF",
+                stroke: false
+            },
             layer: {
                 source: "local",
                 name: "tsudat:tsudat_event_subfaults_view"
