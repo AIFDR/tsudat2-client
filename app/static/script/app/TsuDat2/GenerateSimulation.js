@@ -14,7 +14,6 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     depthLabel: "Flow depth of water onland (m)",
     stageLabel: "Stage, height of the water above MSL (m)",
     velocityLabel: "Velocity of the water (m/s)",
-    outputAsMaximumLabel: "Output the quantities above as the maximum value over the entire duration of the simulation.",
     gaugePointsInstructions: "<b>Optionally, draw gauge points</b> to create time series showing wave heights of the tsunami over the time of the simulation.",
     addGaugePointLabel: "Add gauge point",
     gaugePointNameHeader: "Name",
@@ -183,12 +182,6 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                     hideLabel: true,
                     boxLabel: this.velocityLabel
                 }]
-            }, {
-                xtype: "checkbox",
-                name: "output_max",
-                hideLabel: true,
-                ctCls: "space-above",
-                boxLabel: this.outputAsMaximumLabel
             }, {
                 xtype: "box",
                 autoEl: {
