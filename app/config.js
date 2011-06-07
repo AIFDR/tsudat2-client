@@ -19,10 +19,17 @@ if (java.lang.System.getProperty("app.debug")) {
         if (geoserver.charAt(geoserver.length-1) !== "/") {
             geoserver = geoserver + "/";
         }
-        // debug specific proxy
-        urls.push(
-            [(/^\/geoserver\/(.*)/), require("./proxy").pass({url: geoserver, preserveHost: true})]
-        );
+        var path = geoserver.split("/");
+        var geoserverEndpoint = path[path.length-2];
+        if (geoserverEndpoint != "geoserver") {
+            // debug specific proxy
+            urls.push(
+                [new RegExp("^\\/" + geoserverEndpoint + "\\/(.*)"), require("./proxy").pass({url: geoserver, preserveHost: true})]
+            );
+            urls.push(
+                [(/^\/geoserver\/(.*)/), require("./proxy").pass({url: geoserver, preserveHost: true})]
+            );
+        }
     }
 
     // proxy a remote tsudat app on /tsudat by setting proxy.tsudat to remote URL
