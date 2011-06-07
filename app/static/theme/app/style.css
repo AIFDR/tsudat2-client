@@ -214,8 +214,8 @@ div.map-overlay div.overlay-element {
 .olControlAttribution {
     bottom: 2px;
     font-size: 10px;
-    left: inherit;
-    right: 4px;
+    right: inherit;
+    left: 4px;
 }
 
 /* position the zoom slider within map panel */

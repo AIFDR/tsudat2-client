@@ -7,8 +7,8 @@ OpenLayers.IMAGE_RELOAD_ATTEMPTS = 10;
 // the only resource we need from OpenLayers.ImgPath is blank.gif, and we take
 // this from the theme.
 OpenLayers.ImgPath = "externals/openlayers/theme/default/img/";
-OpenLayers.Layer.WMS.prototype.DEFAULT_PARAMS.transparent = true;
-OpenLayers.Layer.Google.v3.animationEnabled = false;
+// wrap the date line for our tiled base layers
+OpenLayers.Layer.XYZ.prototype.wrapDateLine = true;
 
 var TsuDat2 = Ext.extend(gxp.Viewer, {
     
