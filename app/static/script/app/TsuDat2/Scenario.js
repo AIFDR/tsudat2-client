@@ -18,6 +18,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
     slipTooltip: "Slip",
     selectEventInstructions: "<b>Select one of the {0} events</b> for the tsunami scenario:",
     loadingEventsMsg: "Loading the events valid for this set of parameters...",
+    hazardPointPopupTitle: "Wave Height versus Return Period",
     /** end i18n */
     
     ptype: "app_scenario",
@@ -399,9 +400,41 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 this.parent.form.hazardPointCoords.setValue(
                     format(geom.x, "lat") + ", " + format(geom.y, "lon")
                 );
+                this.parent.showHazardPointGraph(feature);
             }
         }))();
         this.selectHazardPoint.init(target);
+    },
+    
+    showHazardPointGraph: function(feature) {
+        var hazardPointManager = this.target.tools[this.id + "hazardpointmanager"];
+        function closePopup(evt) {
+            popup.close();
+        }
+        var popup = new GeoExt.Popup({
+            location: feature,
+            title: this.hazardPointPopupTitle,
+            autoHeight: true,
+            autoWidth: true,
+            items: [{
+                xtype: "box",
+                width: 300,
+                height: 256,
+                autoEl: {
+                    tag: "img",
+                    src: "/tsudat-media/wh_rp_hazard_graphs/" + feature.attributes.tsudat_id + ".png",
+                    width: 300,
+                    height: 256
+                }
+            }],
+            listeners: {
+                "close": function() {
+                    hazardPointManager.featureLayer.events.unregister("featureadded", this, closePopup);
+                }
+            }
+        });
+        popup.show();
+        hazardPointManager.featureLayer.events.register("featureadded", this, closePopup);
     },
     
     initSubfaultManagement: function(target) {
