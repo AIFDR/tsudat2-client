@@ -159,7 +159,18 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 padding: 5
             }
         }, {
+            ptype: "gxp_featuremanager",
+            id: "eventhighlighter",
+            format: "JSON",
+            maxFeatures: 250,
+            paging: false,
+            layer: {
+                source: "local",
+                name: "tsudat:tsudat_event_subfaults_view"
+            }
+        }, {
             ptype: "app_scenario",
+            eventHighlighter: "eventhighlighter",
             outputTarget: "step1",
             symbolizer: {
                 pointRadius: 4,

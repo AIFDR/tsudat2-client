@@ -24,6 +24,11 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
     
     autoActivate: true,
     
+    /** api: config[eventHighlighter]
+     *  ``String`` id of a FeatureManager configured with a layer that has an
+     *  event_id field to highlight selected events. Optional.
+     */
+    
     /** private: property[hazardPoint]
      *  ``OpenLayers.Feature.Vector``
      */
@@ -60,6 +65,8 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 target.mapPanel.map.events.unregister("addlayer", this, arguments.callee);
             }
         });
+
+        target.tools[this.eventHighlighter].showLayer();
 
         TsuDat2.Scenario.superclass.init.apply(this, arguments);
     },
@@ -300,17 +307,31 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                     singleSelect: true,
                     listeners: {
                         "selectionchange": function(sm) {
+                            var eventHighlighter = this.target.tools[this.eventHighlighter];
                             if (sm.getCount() == 0) {
                                 this.setValid(false);
+                                if (eventHighlighter) {
+                                    eventHighlighter.clearFeatures();
+                                }
                             } else {
                                 var sz = this.form.sourceZone;
+                                var event = sm.getSelected().get("id");
+                                if (eventHighlighter) {
+                                    eventHighlighter.loadFeatures(
+                                        new OpenLayers.Filter.Comparison({
+                                            type: OpenLayers.Filter.Comparison.EQUAL_TO,
+                                            property: "event_id",
+                                            value: event
+                                        })
+                                    );
+                                }
                                 this.setValid(true, {
                                     hazard_point: Number(this.hazardPoint.fid.split(".").pop()),
                                     source_zone: sz.store.getAt(sz.store.findExact("source_zone", sz.getValue())).id,
                                     wave_height_delta: this.form.waveHeightDelta.getValue(),
                                     wave_height: this.form.waveHeight.getValue(),
                                     return_period: this.form.returnPeriod.getValue(),
-                                    event: sm.getSelected().get("id")
+                                    event: event
                                 });
                             }
                         },
