@@ -463,6 +463,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
         }
         var hp = this.hazardPoint && this.hazardPoint.attributes.tsudat_id,
             rp = this.form.returnPeriod.getValue();
+        this.setReturnPeriodFilter(rp, hp);
         if (hp && rp) {
             Ext.Ajax.request({
                 method: "GET",
@@ -498,8 +499,9 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 },
                 success: function(response) {
                     var result = Ext.decode(response.responseText)[0];
-                    this.form.returnPeriod.setValue(result.fields.return_period);
-                    this.setReturnPeriodFilter(result.fields.return_period, hp);
+                    var returnPeriod = result.fields.return_period;
+                    this.form.returnPeriod.setValue(returnPeriod);
+                    this.setReturnPeriodFilter(returnPeriod, hp);
                 },
                 scope: this
             });
