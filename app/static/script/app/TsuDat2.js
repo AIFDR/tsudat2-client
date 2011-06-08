@@ -233,13 +233,25 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             eventHighlighter: "eventhighlighter",
             outputTarget: "step1",
             symbolizer: {
-                pointRadius: 4,
-                graphicName: "square",
-                fillColor: "white",
-                fillOpacity: 0.5,
-                strokeWidth: 1,
-                strokeOpacity: 1,
-                strokeColor: "#333333"
+                hazardPoint: {
+                    pointRadius: 4,
+                    graphicName: "square",
+                    fillColor: "white",
+                    fillOpacity: 0.5,
+                    strokeWidth: 1,
+                    strokeOpacity: 1,
+                    strokeColor: "#333333",
+                    rotation: 45
+                },
+                subfault: {
+                    pointRadius: 4,
+                    graphicName: "square",
+                    fillColor: "white",
+                    fillOpacity: 0.5,
+                    strokeWidth: 1,
+                    strokeOpacity: 1,
+                    strokeColor: "#333333"
+                }
             }
         }, {
             ptype: "app_simulationarea",

@@ -36,7 +36,9 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
     hazardPoint: null,
     
     /** api: config[symbolizer]
-     *  ``Object`` Symbolizer for selected hazard points and sub-faults
+     *  ``Object`` Symbolizer for selected hazard points and sub-faults. The
+     *  object expected has two keys, hazardPoint and subfault, with a valid
+     *  OpenLayers symbolizer as value for each.
      */
     
     /** private: property[selectHazardPoint]
@@ -359,7 +361,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 name: "tsudat:tsudat_hazardpoint"
             },
             paging: false,
-            symbolizer: this.symbolizer
+            symbolizer: this.symbolizer.hazardPoint
         });
         hazardPointManager.init(target);
         this.selectHazardPoint = new (Ext.extend(gxp.plugins.ClickableFeatures, {
@@ -446,7 +448,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 name: "tsudat:tsudat_subfault"
             },
             paging: false,
-            symbolizer: this.symbolizer
+            symbolizer: this.symbolizer.subfault
         });
         subfaultManager.init(target);
         this.selectSubfault = new (Ext.extend(gxp.plugins.ClickableFeatures, {
