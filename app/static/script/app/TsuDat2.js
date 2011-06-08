@@ -52,10 +52,34 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 id: "paneltbar",
                 items: [{
                     iconCls: "icon-geonode",
-                    text: "&nbsp;TsuDat2",
-                    handler: function() {
-                        window.location.href = "/";
+                    text: "&nbsp;TsuDAT&nbsp;",
+                    menu: {
+                        items: [{
+                            text: "About TsuDAT Simulator",
+                            iconCls: "about",
+                            handler: function() {
+                                new Ext.Window({
+                                    width: 400,
+                                    height: 400,
+                                    title: "About TsuDAT Simulator",
+                                    bodyCfg: {
+                                        tag: "iframe",
+                                        style: {border: "0px none"},
+                                        src: "/tsudat/about"
+                                    }
+                                }).show();
+                            }
+                        }, {
+                            text: "TsuDAT Home",
+                            iconCls: "home",
+                            handler: function() {
+                                window.location.href = "/";
+                            }
+                        }]
                     }
+                    /*handler: function() {
+                        window.location.href = "/";
+                    }*/
                 }, "-", "-", "->", {
                     xtype: "tbtext",
                     ref: "loginName",
