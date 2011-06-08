@@ -56,7 +56,22 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                     handler: function() {
                         window.location.href = "/";
                     }
-                }, "-", "-"]
+                }, "-", "-", "->", {
+                    xtype: "tbtext",
+                    ref: "loginName",
+                    text: ""
+                }, {
+                    text: "Login",
+                    ref: "loginButton",
+                    iconCls: "login",
+                    listeners: {
+                        "render": this.updateLoginStatus,
+                        "click": function() {
+                            this.login(this.updateLoginStatus);
+                        },
+                        scope: this
+                    }
+                }]
             },
             items: [{
                 xtype: "tabpanel",
@@ -251,8 +266,10 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 waitMsg: "Logging in...",
                 success: function(form, action) {
                     win.close();
-                    // resend the original request
-                    Ext.Ajax.request(options);
+                    // resend the original request or call function
+                    typeof options == "function" ?
+                        options.call(this) :
+                        Ext.Ajax.request(options);
                 },
                 failure: function(form, action) {
                     var username = form.items.get(0);
@@ -331,6 +348,24 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             msg: msg,
             icon: Ext.MessageBox.ERROR,
             buttons: {ok: true}
+        });
+    },
+    
+    updateLoginStatus: function() {
+        Ext.Ajax.request({
+            url: "/data/acls",
+            method: "GET",
+            success: function(response) {
+                try {
+                    var acls = Ext.decode(response.responseText);
+                    if (acls.name) {
+                        var toolbar = Ext.getCmp("paneltbar");
+                        toolbar.loginName.setText(acls.name);
+                        toolbar.loginButton.hide();
+                    }
+                } catch(e) {}
+            },
+            scope: this
         });
     },
         

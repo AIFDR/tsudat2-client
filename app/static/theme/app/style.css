@@ -294,4 +294,6 @@ p.x-form-item {
     padding-left: 0;
     padding-right: 0;
 }
-
+.x-btn .login {
+    background-image: url(img/silk/door_in.png);
+}
