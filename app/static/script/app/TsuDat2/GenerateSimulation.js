@@ -357,6 +357,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     
     saveScenario: function() {
         var values = this.form.getForm().getFieldValues();
+        values.output_max = true;
         for (var i=values.output_layers.length-1; i>=0; --i) {
             values.output_layers[i] = values.output_layers[i].name;
         }
