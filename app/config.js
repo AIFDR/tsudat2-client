@@ -41,7 +41,7 @@ if (java.lang.System.getProperty("app.debug")) {
         }
         // debug specific proxy
         urls.push(
-            [(/^\/tsudat\/(.*)/), require("./proxy").pass({url: tsudat, preserveHost: true})]
+            [(/^\/tsudat\/(.*)/), require("./proxy").pass({url: tsudat, preserveHost: false})]
         );
     }
 
@@ -57,7 +57,7 @@ if (java.lang.System.getProperty("app.debug")) {
         for (var i=geonodeUrls.length-1; i>=0; --i) {
             url = geonodeUrls[i];
             urls.push(
-                [new RegExp("^\\/" + url.replace("/", "\\/") + "(.*)"), require("./proxy").pass({url: geonode + url, preserveHost: true})]
+                [new RegExp("^\\/" + url.replace("/", "\\/") + "(.*)"), require("./proxy").pass({url: geonode + url, preserveHost: false})]
             );
         }        
     }
