@@ -67,7 +67,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                     listeners: {
                         "render": this.updateLoginStatus,
                         "click": function() {
-                            this.login(this.updateLoginStatus);
+                            this.login();
                         },
                         scope: this
                     }
@@ -267,9 +267,8 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 success: function(form, action) {
                     win.close();
                     // resend the original request or call function
-                    typeof options == "function" ?
-                        options.call(this) :
-                        Ext.Ajax.request(options);
+                    options && Ext.Ajax.request(options);
+                    this.updateLoginStatus();
                 },
                 failure: function(form, action) {
                     var username = form.items.get(0);
