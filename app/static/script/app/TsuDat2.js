@@ -71,6 +71,20 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                         },
                         scope: this
                     }
+                }, {
+                    text: "Logout",
+                    ref: "logoutButton",
+                    iconCls: "logout",
+                    hidden: true,
+                    handler: function() {
+                        Ext.Ajax.request({
+                            method: "GET",
+                            url: "/accounts/logout",
+                            callback: this.updateLoginStatus,
+                            scope: this
+                        });
+                    },
+                    scope: this
                 }]
             },
             items: [{
@@ -355,14 +369,21 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             url: "/data/acls",
             method: "GET",
             success: function(response) {
+                var acls;
                 try {
-                    var acls = Ext.decode(response.responseText);
-                    if (acls.name) {
-                        var toolbar = Ext.getCmp("paneltbar");
-                        toolbar.loginName.setText(acls.name);
-                        toolbar.loginButton.hide();
-                    }
-                } catch(e) {}
+                    acls = Ext.decode(response.responseText);
+                } catch(e) {
+                    acls = {name: ""};
+                }
+                var toolbar = Ext.getCmp("paneltbar");
+                toolbar.loginName.setText(acls.name);
+                if (acls.name) {
+                    toolbar.loginButton.hide();
+                    toolbar.logoutButton.show();
+                } else {
+                    toolbar.loginButton.show();
+                    toolbar.logoutButton.hide();
+                }
             },
             scope: this
         });
