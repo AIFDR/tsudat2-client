@@ -21,7 +21,9 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     gaugePointUnitHeader: "Unit",
     gaugePointRemoveActionTooltip: "Remove gauge point",
     saveSimulationText: "Save Simulation",
-    generateSimulationText: "<b>Run Simulation</b>",
+    generateSimulationText: "<b>Run Simulation...</b>",
+    generateSimulationConfirmationTitle: "Run Simulation",
+    generateSimulationConfirmationText: "Confirm that you want to run this simulation. Note that the simulation may take a while, and you will be notified by email when it is finished.",
     savedTitle: "Scenario Saved",
     savedMsg: "Scenario {0} saved successfully.",
     queuedTitle: "Scenario Queued",
@@ -382,15 +384,17 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     },
     
     runScenario: function() {
-        Ext.Ajax.request({
-            method: "POST",
-            url: "/tsudat/run_scenario/" + this.scenarioId + "/",
-            success: function() {
-                Ext.Msg.alert(this.queuedTitle, String.format(this.queuedMsg, this.scenarioId));
-                this.scenarioId = null;
-            },
-            scope: this
-        });
+        Ext.Msg.confirm(this.generateSimulationConfirmationTitle, this.generateSimulationConfirmationText, function(btn) {
+            btn == "yes" && Ext.Ajax.request({
+                method: "POST",
+                url: "/tsudat/run_scenario/" + this.scenarioId + "/",
+                success: function() {
+                    Ext.Msg.alert(this.queuedTitle, String.format(this.queuedMsg, this.scenarioId));
+                    this.scenarioId = null;
+                },
+                scope: this
+            });
+        }, this);
     }
     
 });
