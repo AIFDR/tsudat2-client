@@ -389,7 +389,6 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
             },
             deactivate: function() {
                 if (gxp.plugins.ClickableFeatures.prototype.deactivate.apply(this, arguments)) {
-                    hazardPointManager.hideLayer(this.id);
                     this.control.deactivate();
                     return true;
                 }
@@ -477,7 +476,6 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
             },
             deactivate: function() {
                 if (gxp.plugins.ClickableFeatures.prototype.deactivate.apply(this, arguments)) {
-                    subfaultManager.hideLayer(this.id);
                     this.control.deactivate();
                     return true;
                 }

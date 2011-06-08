@@ -209,7 +209,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     
     activate: function() {
         if (TsuDat2.SimulationArea.superclass.activate.apply(this, arguments)) {
-            this.target.mapPanel.map.addLayer(this.vectorLayer);
             this.modifyControl.activate();
         }
     },
@@ -218,7 +217,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         if (TsuDat2.SimulationArea.superclass.deactivate.apply(this, arguments)) {
             this.drawControl.deactivate();
             this.modifyControl.deactivate();
-            this.target.mapPanel.map.removeLayer(this.vectorLayer);
         }
     },
     
@@ -470,6 +468,14 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             }
         }));
         
+        this.wizardContainer.on("wizardstepexpanded", function(index) {
+            if (index >= this.index) {
+                this.vectorLayer.map || this.target.mapPanel.map.addLayer(this.vectorLayer);
+            } else {
+                this.vectorLayer.map && this.target.mapPanel.map.removeLayer(this.vectorLayer);
+            }
+        }, this);
+
         this.vectorLayer.events.on({
             "featureselected": function(e) {
                 this._toggling = true;

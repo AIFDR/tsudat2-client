@@ -94,7 +94,6 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
 
     activate: function() {
         if (TsuDat2.GenerateSimulation.superclass.activate.apply(this, arguments)) {
-            this.target.mapPanel.map.addLayer(this.vectorLayer);
             this.modifyControl.activate();
         }
     },
@@ -103,12 +102,11 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
         if (TsuDat2.GenerateSimulation.superclass.deactivate.apply(this, arguments)) {
             this.drawControl.deactivate();
             this.modifyControl.deactivate();
-            this.target.mapPanel.map.removeLayer(this.vectorLayer);
         }
     },
     
     addOutput: function(config) {
-        return (this.form = TsuDat2.GenerateSimulation.superclass.addOutput.call(this, {
+        this.form = TsuDat2.GenerateSimulation.superclass.addOutput.call(this, {
             xtype: "form",
             labelWidth: 95,
             monitorValid: true,
@@ -282,7 +280,17 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                 },
                 scope: this
             }
-        }));
+        });
+        
+        this.wizardContainer.on("wizardstepexpanded", function(index) {
+            if (index >= this.index) {
+                this.vectorLayer.map || this.target.mapPanel.map.addLayer(this.vectorLayer);
+            } else {
+                this.vectorLayer.map && this.target.mapPanel.map.removeLayer(this.vectorLayer);
+            }
+        }, this);
+        
+        return this.form;
     },
     
     persistFeature: function(e) {
