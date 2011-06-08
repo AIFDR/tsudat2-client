@@ -301,10 +301,10 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 }),
                 columns: [
                     {header: "ID", dataIndex: "id"},
-                    {header: "prob", dataIndex: "probability", tooltip: this.probabilityTooltip},
-                    {header: "wh", dataIndex: "wave_height", tooltip: this.waveHeightTooltip},
-                    {header: "M", dataIndex: "magnitude", tooltip: this.magnitudeTooltip},
-                    {header: "slip", dataIndex: "slip", tooltip: this.slipTooltip}
+                    {header: "prob", dataIndex: "probability", tooltip: this.probabilityTooltip, sortable: true},
+                    {header: "wh", dataIndex: "wave_height", tooltip: this.waveHeightTooltip, sortable: true},
+                    {header: "M", dataIndex: "magnitude", tooltip: this.magnitudeTooltip, sortable: true},
+                    {header: "slip", dataIndex: "slip", tooltip: this.slipTooltip, sortable: true}
                 ],
                 sm: new Ext.grid.RowSelectionModel({
                     singleSelect: true,
@@ -552,6 +552,8 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 var filter = "return_period=" + returnPeriod;
                 var hpLayer = hpRec.getLayer();
                 if (hpLayer.params.CQL_FILTER != filter) {
+                    // make initially invisible layer visible
+                    hpLayer.params.CQL_FILTER || hpLayer.setVisibility(true);
                     hpLayer.mergeNewParams({
                         layers: "tsudat:tsudat_hazardpoint_rp",
                         styles: "tsudat_hazard_point_rp",
