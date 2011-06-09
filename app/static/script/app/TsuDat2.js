@@ -207,6 +207,14 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             ptype: "gxp_removelayer",
             actionTarget: ["tree.tbar", "tree.contextMenu"]
         }, {
+            ptype: "gxp_layerproperties",
+            layerPanelConfig: {
+                "gxp_wmslayerpanel": {
+                    styling: false
+                }
+            },
+            actionTarget: ["tree.tbar", "tree.contextMenu"]
+        }, {
             ptype: "gxp_zoomtolayerextent",
             closest: false,
             actionTarget: ["tree.tbar", "tree.contextMenu"]
