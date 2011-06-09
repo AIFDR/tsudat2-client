@@ -46,12 +46,17 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         }];
         
         config.portalItems = [{
+            xtype: "container",
+            region: "north",
+            cls: "tsudat-header",
+            height: 30,
+            html: '<a class="tsudat-logo" href="/">TsuDAT</a>'
+        }, {
             region: "center",
             layout: "border",
             tbar: {
                 id: "paneltbar",
                 items: [{
-                    iconCls: "icon-geonode",
                     text: "&nbsp;TsuDAT&nbsp;",
                     menu: {
                         items: [{
@@ -120,6 +125,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 collapsible: true,
                 collapsed: true,
                 collapseMode: "mini",
+                hideCollapseTool: true,
                 header: false,
                 listeners: {
                     "add": {

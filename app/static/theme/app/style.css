@@ -310,3 +310,19 @@ p.x-form-item {
 .x-menu-item .about {
     background-image: url(img/silk/help.png);
 }
+/* Top toolbar */
+.tsudat-header {
+    background-color: #132538;
+    background-image: url(img/header-bg-tsudat.png);
+    background-repeat: no-repeat;
+}
+.tsudat-header .tsudat-logo {
+    background-color: transparent;
+    margin: 3px 0 0 10px;
+    background-image: url(img/logo-tsudat-bg.png);
+    background-repeat: no-repeat;
+    line-height: 25px;
+    width: 125px;
+    text-indent: -9999px;
+    display: block;
+}
