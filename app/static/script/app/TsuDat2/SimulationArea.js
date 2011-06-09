@@ -308,7 +308,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 ref: "meshFriction",
                 xtype: "numberfield",
                 allowBlank: false,
-                value: 0.0001,
+                value: 0.01,
                 width: 60,
                 minValue: 0.0001,
                 maxValue: 1,

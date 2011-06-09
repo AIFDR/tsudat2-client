@@ -39,7 +39,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                 items: [{
                     xtype: "numberfield",
                     name: "initial_tidal_stage",
-                    value: 1,
+                    value: 0,
                     width: 60,
                     allowBlank: false
                 }, {
@@ -69,7 +69,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                 items: [{
                     xtype: "numberfield",
                     name: "end_time",
-                    value: 1000000,
+                    value: 3600,
                     width: 60,
                     allowBlank: false
                 }, {
@@ -83,7 +83,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                 name: "smoothing_param",
                 width: 60,
                 anchor: null,
-                value: 0.00001,
+                value: 0.1,
                 allowBlank: false
             }, {
                 xtype: "radiogroup",
