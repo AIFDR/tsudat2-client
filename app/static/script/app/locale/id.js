@@ -73,7 +73,7 @@ GeoExt.Lang.add("id", {
         previousMenuText: "Zoom ke luas sebelumnya",
         nextMenuText: "Zoom ke luas setelahnya",
         previousTooltip: "Zoom ke luas sebelumnya",
-        nextTooltip: "Zoom ke luas setelahnya",
+        nextTooltip: "Zoom ke luas setelahnya"
     },
 
     "gxp.plugins.OSMSource.prototype": {
