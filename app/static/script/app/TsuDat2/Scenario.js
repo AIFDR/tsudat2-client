@@ -558,7 +558,8 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                     hpLayer.params.CQL_FILTER || hpLayer.setVisibility(true);
                     hpLayer.mergeNewParams({
                         layers: "tsudat:tsudat_hazardpoint_rp",
-                        styles: "tsudat_hazard_point_rp",
+                        styles: null,
+                        sld: "http://localhost/tsudat/hp_rp_style.xml?rp=" + returnPeriod,
                         cql_filter: filter
                     });
                 }
