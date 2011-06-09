@@ -95,12 +95,14 @@
                         name: "tsudat:tsudat_hazardpoint",
                         title: "Hazard Points",
                         cached: true,
-                        visibility: false
+                        visibility: false,
+                        format: Ext.isIE6 ? "image/png8" : "image/png"
                     }, {
                         source: "local",
                         name: "tsudat:tsudat_subfault",
                         title: "Sub-Faults",
-                        cached: true
+                        cached: true,
+                        format: Ext.isIE6 ? "image/png8" : "image/png"
                     }, {
                         source: "google",
                         title: "Google Roadmap",
