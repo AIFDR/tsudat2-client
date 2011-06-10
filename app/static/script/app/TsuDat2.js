@@ -234,9 +234,9 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             symbolizer: {
                 graphicName: "circle",
                 pointRadius: 5,
-                fillOpacity: 0.5,
-                fillColor: "#FFFFFF",
-                stroke: false
+                fill: false,
+                strokeColor: "#3CFCF3",
+                strokeWidth: 2
             },
             layer: {
                 source: "local",
@@ -259,12 +259,9 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 },
                 subfault: {
                     pointRadius: 4,
-                    graphicName: "square",
-                    fillColor: "white",
-                    fillOpacity: 0.5,
+                    graphicName: "circle",
                     strokeWidth: 1,
-                    strokeOpacity: 1,
-                    strokeColor: "#333333"
+                    strokeColor: "#3CFCF3"
                 }
             }
         }, {
