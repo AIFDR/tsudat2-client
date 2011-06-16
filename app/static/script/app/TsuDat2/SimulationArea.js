@@ -735,7 +735,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         if (!this._working && valid && haveDems && this.projectId) {
             lastValid || this.setValid(true, {
                 project: this.projectId,
-                default_friction_value: this.form.meshFriction.getValue()
+                default_friction_value: this.form.meshFriction.getValue(),
+                bounding_polygon_maxarea: this.form.meshResolution.getValue()
             });
         } else {
             lastValid && this.setValid(false);

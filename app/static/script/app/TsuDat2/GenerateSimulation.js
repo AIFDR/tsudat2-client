@@ -365,7 +365,6 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
         }
         Ext.apply(values, this.wizardData);
         values.use_aoi = values.use_aoi[1];
-        //TODO raster resolution? mesh resolution?
         Ext.Ajax.request({
             method: this.scenarioId ? "PUT" : "POST",
             url: this.scenarioId ? "/tsudat/scenario/" + this.scenarioId + "/" : "/tsudat/scenario/",
