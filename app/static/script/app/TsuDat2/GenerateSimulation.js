@@ -169,16 +169,19 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                 items: [{
                     xtype: "checkbox",
                     name: "depth",
+                    checked: true,
                     hideLabel: true,
                     boxLabel: this.depthLabel
                 }, {
                     xtype: "checkbox",
                     name: "stage",
+                    checked: true,
                     hideLabel: true,
                     boxLabel: this.stageLabel
                 }, {
                     xtype: "checkbox",
                     name: "velocity",
+                    checked: true,
                     hideLabel: true,
                     boxLabel: this.velocityLabel
                 }]
