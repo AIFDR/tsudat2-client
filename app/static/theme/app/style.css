@@ -244,13 +244,13 @@ div.map-overlay div.overlay-element {
 
 /* app_tsunamiscenario */
 input.hazardpoint {
-    background-image: url(/geoserver/wms?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&layer=tsudat:tsudat_hazardpoint);
+    background-image: url(img/hazardpoint.png);
     background-repeat: no-repeat;
     background-position: center left;
     padding-left: 20px;
 }
 input.subfault {
-    background-image: url(/geoserver/wms?service=wms&version=1.1.1&request=GetLegendGraphic&format=image/png&layer=tsudat:tsudat_subfault);
+    background-image: url(img/subfault.png);
     background-repeat: no-repeat;
     background-position: center left;
     padding-left: 20px;

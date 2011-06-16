@@ -249,19 +249,17 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             symbolizer: {
                 hazardPoint: {
                     pointRadius: 4,
-                    graphicName: "square",
-                    fillColor: "white",
-                    fillOpacity: 0.5,
+                    graphicName: "circle",
                     strokeWidth: 1,
-                    strokeOpacity: 1,
-                    strokeColor: "#333333",
-                    rotation: 45
+                    strokeColor: "#FF0000",
+                    fillColor: "#FF0000"
                 },
                 subfault: {
                     pointRadius: 4,
                     graphicName: "circle",
                     strokeWidth: 1,
-                    strokeColor: "#3CFCF3"
+                    strokeColor: "#3CFCF3",
+                    fillColor: "#FF0000"
                 }
             }
         }, {
