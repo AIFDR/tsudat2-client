@@ -82,9 +82,6 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                             }
                         }]
                     }
-                    /*handler: function() {
-                        window.location.href = "/";
-                    }*/
                 }, "-", "-", "->", {
                     xtype: "tbtext",
                     ref: "loginName",

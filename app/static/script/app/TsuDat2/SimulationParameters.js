@@ -18,6 +18,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
     ptype: "app_simulationparameters",
     
     addOutput: function(config) {
+        var data; // result data
         var output = TsuDat2.SimulationParameters.superclass.addOutput.call(this, {
             xtype: "form",
             labelWidth: 80,
@@ -105,10 +106,14 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
             }],
             listeners: {
                 "clientvalidation": function(fp, valid) {
-                    if (valid !== this.valid) {
-                        var data = output.getForm().getFieldValues();
-                        data.model_setup = data.model_setup.value;
-                        this.setValid(valid, data);
+                    if (valid) {
+                        values = output.getForm().getFieldValues();
+                        values.model_setup = values.model_setup.value;
+                        var newData = Ext.encode(values);
+                        if (data !== newData) {
+                            data = newData;
+                            this.setValid(valid, data);
+                        }
                     }
                 },
                 scope: this
