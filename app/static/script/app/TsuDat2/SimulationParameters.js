@@ -110,9 +110,9 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                         values = output.getForm().getFieldValues();
                         values.model_setup = values.model_setup.value;
                         var newData = Ext.encode(values);
-                        if (data !== newData) {
+                        if (data != newData) {
                             data = newData;
-                            this.setValid(valid, data);
+                            this.setValid(valid, values);
                         }
                     }
                 },
