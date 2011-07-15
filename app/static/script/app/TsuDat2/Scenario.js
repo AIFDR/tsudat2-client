@@ -361,6 +361,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 name: "tsudat:tsudat_hazardpoint"
             },
             paging: false,
+            format: "JSON",
             symbolizer: this.symbolizer.hazardPoint
         });
         hazardPointManager.init(target);
@@ -448,6 +449,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                 name: "tsudat:tsudat_subfault"
             },
             paging: false,
+            format: "JSON",
             symbolizer: this.symbolizer.subfault
         });
         subfaultManager.init(target);
