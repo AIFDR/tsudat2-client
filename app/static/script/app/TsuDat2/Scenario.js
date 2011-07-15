@@ -417,8 +417,8 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
         var popup = new GeoExt.Popup({
             location: feature,
             title: this.hazardPointPopupTitle,
-            autoHeight: true,
-            autoWidth: true,
+            height: 304,
+            width: 314,
             items: [{
                 xtype: "box",
                 width: 300,
