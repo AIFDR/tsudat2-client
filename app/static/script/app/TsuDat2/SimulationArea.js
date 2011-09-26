@@ -247,9 +247,12 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 html: this.simulationAreaInstructions
             }, {
                 xtype: "container",
+                fieldLabel: this.simulationAreaLabel
+            }, {
+                xtype: "container",
                 layout: "hbox",
-                cls: "composite-wrap",
-                fieldLabel: this.simulationAreaLabel,
+                cls: "x-form-item composite-wrap",
+                fieldLabel: null,
                 items: [{
                     xtype: "button",
                     ref: "../drawSimulationArea",
