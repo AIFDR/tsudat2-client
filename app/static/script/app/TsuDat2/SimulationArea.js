@@ -537,15 +537,19 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         }
         var url, method,
             feature = e.feature,
+            recheckInternalPolygons = false,
             isInternalPolygon = feature.attributes.type != null;
         switch (e.type) {
             case "featureadded":
-                var modified = !isInternalPolygon && this.projectId;
+                var modified = !isInternalPolygon && (this.projectId !== null);
                 method = modified ? "PUT" : "POST";
+                if (modified === true) {
+                    recheckInternalPolygons = true;
+                }
                 break;
             case "featuremodified":
                 var modified = feature.fid ||
-                    !isInternalPolygon && this.projectId;
+                    !isInternalPolygon && (this.projectId !== null);
                 method = modified ? "PUT" : "POST";
                 break;
             case "featureremoved":
@@ -614,6 +618,15 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 this._commit = true;
                 this.featureStore.commitChanges();
                 delete this._commit;
+                if (recheckInternalPolygons === true) {
+                    for (var i=0, len=this.vectorLayer.features.length; i<len; i++) {
+                        var f = this.vectorLayer.features[i];
+                        if (f.attributes.type != null) {
+                            // recheck all internal polygons
+                            this.persistFeature({type: "featuremodified", feature: f});
+                        }
+                    }
+                }
             },
             failure: function(response) {
                 this.vectorLayer.removeFeatures([feature]);
