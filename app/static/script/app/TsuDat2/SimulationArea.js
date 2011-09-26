@@ -180,7 +180,15 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                         this.target.showTree();
                         var demSource = this.target.layerSources[this.demSource];
                         demSource.store.filterBy(function(rec) {
-                            return this.demStore.findExact("typename", rec.get("name")) != -1;
+                            var keywords = rec.get("keywords");
+                            var matches = ["category:hazard", "subcategory:tsunami", "unit:m", "source:tsudat", "source:flow_depth"];
+                            var matchCount = 0;
+                            Ext.each(keywords, function(keyword, index) {
+                                if (matches.indexOf(keyword) != -1) {
+                                    matchCount++;
+                                }
+                            });
+                            return this.demStore.findExact("typename", rec.get("name")) != -1 && matchCount != 5;
                         }, this);
                         origCreateLayerRecord = demSource.createLayerRecord;
                         demSource.createLayerRecord = (function() {
