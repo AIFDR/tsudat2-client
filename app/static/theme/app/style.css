@@ -53,6 +53,10 @@ body {
     background-image: url(img/silk/delete.png);
 }
 
+.x-btn .icon-delete-simulation-area {
+    background-image: url(img/silk/delete.png);
+}
+
 .x-btn .icon-properties, .x-menu-item .icon-properties {
     background-image: url(img/silk/wrench.png);
 }

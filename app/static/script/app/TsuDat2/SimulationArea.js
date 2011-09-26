@@ -28,6 +28,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     uploadButtonText: "Upload",
     uploadFileLabel: "CSV file",
     uploadCrsLabel: "CRS",
+    deleteButtonText: "Delete",
     /** end i18n */
     
     ptype: "app_simulationarea",
@@ -293,6 +294,24 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                         this.showUploadWindow(btn);
                     },
                     scope: this
+                }, {
+                    xtype: "label",
+                    text: "or",
+                    cls: "composite"
+                }, {
+                    xtype: "button",
+                    iconCls: "icon-delete-simulation-area",
+                    text: this.deleteButtonText,
+                    toggleGroup: "draw",
+                    allowDepress: true,
+                    handler: function(btn) {
+                        this.addDem.actions[0].disable();
+                        this.form.drawInternalPolygon.disable();
+                        this.form.importInternalPolygon.disable();
+                        this.vectorLayer.removeFeatures([this.simulationArea]);
+                        this.simulationArea = null;
+                    },
+                    scope: this
                 }]
             }, {
                 xtype: "container",
@@ -518,7 +537,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             isInternalPolygon = feature.attributes.type != null;
         switch (e.type) {
             case "featureadded":
-                method = "POST";
+                var modified = !isInternalPolygon && this.projectId;
+                method = modified ? "PUT" : "POST";
                 break;
             case "featuremodified":
                 var modified = feature.fid ||
