@@ -584,6 +584,10 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 this.featureStore.commitChanges();
                 delete this._commit;
             },
+            failure: function(response) {
+                this.vectorLayer.removeFeatures([feature]);
+                this.target.displayXHRTrouble(response);
+            },
             scope: this
         });
     },
