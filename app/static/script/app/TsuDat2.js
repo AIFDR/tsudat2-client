@@ -304,7 +304,18 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                         new OpenLayers.Rule({
                             elseFilter: true,
                             symbolizer: {
-                                fillColor: "white"
+                                "Polygon": {
+                                    fillColor: "white"
+                                },
+                                "Point": {
+                                    pointRadius: 4,
+                                    graphicName: "square",
+                                    fillColor: "white",
+                                    fillOpacity: 1,
+                                    strokeWidth: 1,
+                                    strokeOpacity: 1,
+                                    strokeColor: "#333333"
+                                }
                             }
                         })
                     ]
