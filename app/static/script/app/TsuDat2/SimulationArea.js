@@ -118,7 +118,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         TsuDat2.SimulationArea.superclass.init.apply(this, arguments);
 
         this.vectorLayer = new OpenLayers.Layer.Vector(this.id + "_vectorlayer", {
-            styleMap: this.styleMap,
+            /*styleMap: this.styleMap,*/
             projection: new OpenLayers.Projection("EPSG:4326"),
             displayInLayerSwitcher: false,
             // because we don't read features, have multiple featuretypes in
@@ -532,7 +532,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     },
     
     persistFeature: function(e) {
-        if (this._commit || e.type == "featureremoved" && !e.feature.fid) {
+        // TODO remove the check for _sketch once this issue gets resolved in OpenLayers
+        if (this._commit || e.feature._sketch === true || e.type == "featureremoved" && !e.feature.fid) {
             return;
         }
         var url, method,
@@ -619,13 +620,9 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 this.featureStore.commitChanges();
                 delete this._commit;
                 if (recheckInternalPolygons === true) {
-                    for (var i=0, len=this.vectorLayer.features.length; i<len; i++) {
-                        var f = this.vectorLayer.features[i];
-                        if (f.attributes.type != null) {
-                            // recheck all internal polygons
-                            this.persistFeature({type: "featuremodified", feature: f});
-                        }
-                    }
+                    this.featureStore.each(function(rec) {
+                        this.persistFeature({type: "featuremodified", feature: rec.getFeature()});
+                    }, this);
                 }
             },
             failure: function(response) {
