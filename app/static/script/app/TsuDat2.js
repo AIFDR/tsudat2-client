@@ -43,6 +43,8 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             xtype: "gx_zoomslider",
             vertical: true,
             height: 100
+        }, {
+            xtype: "gxp_scaleoverlay"
         }];
         
         config.portalItems = [{
