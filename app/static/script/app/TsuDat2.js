@@ -263,7 +263,53 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             }
         }, {
             ptype: "app_simulationarea",
-            outputTarget: "step2"
+            outputTarget: "step2",
+            styleMap: new OpenLayers.StyleMap({
+                "default": new OpenLayers.Style({
+                    strokeColor: "white",
+                    strokeWidth: 1,
+                    fillOpacity: 0.5
+                }, {
+                    rules: [
+                        new OpenLayers.Rule({
+                            filter: new OpenLayers.Filter.Comparison({
+                                type: OpenLayers.Filter.Comparison.EQUAL_TO,
+                                property: "type",
+                                value: 1
+                            }),
+                            symbolizer: {
+                                fillColor: "maroon"
+                            }
+                        }),
+                        new OpenLayers.Rule({
+                            filter: new OpenLayers.Filter.Comparison({
+                                type: OpenLayers.Filter.Comparison.EQUAL_TO,
+                                property: "type",
+                                value: 2
+                            }),
+                            symbolizer: {
+                                fillColor: "olive"
+                            }
+                        }),
+                        new OpenLayers.Rule({
+                            filter: new OpenLayers.Filter.Comparison({
+                                type: OpenLayers.Filter.Comparison.EQUAL_TO,
+                                property: "type",
+                                value: 3
+                            }),
+                            symbolizer: {
+                                fillColor: "teal"
+                            }
+                        }),
+                        new OpenLayers.Rule({
+                            elseFilter: true,
+                            symbolizer: {
+                                fillColor: "white"
+                            }
+                        })
+                    ]
+                }
+            )})
         }, {
             ptype: "app_simulationparameters",
             outputTarget: "step3"

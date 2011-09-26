@@ -117,6 +117,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         TsuDat2.SimulationArea.superclass.init.apply(this, arguments);
 
         this.vectorLayer = new OpenLayers.Layer.Vector(this.id + "_vectorlayer", {
+            styleMap: this.styleMap,
             projection: new OpenLayers.Projection("EPSG:4326"),
             displayInLayerSwitcher: false,
             // because we don't read features, have multiple featuretypes in
