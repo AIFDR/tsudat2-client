@@ -37,6 +37,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
     /** private: method[initComponent]
      */
     initComponent: function() {
+        var me = this;
         this.items = [{
             xtype: "textfield",
             name: "layer_title",
@@ -78,7 +79,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             },
             validator: function(name) {
                 if ((name.length > 0) && (name.search(/\.dbf$/i) == -1)) {
-                    return this.dbfInvalidText;
+                    return me.dbfInvalidText;
                 } else {
                     return true;
                 }
@@ -97,7 +98,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             },
             validator: function(name) {
                 if ((name.length > 0) && (name.search(/\.shx$/i) == -1)) {
-                    return this.shxInvalidText;
+                    return me.shxInvalidText;
                 } else {
                     return true;
                 }
@@ -116,7 +117,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             },
             validator: function(name) {
                 if ((name.length > 0) && (name.search(/\.prj$/i) == -1)) {
-                    return this.prjInvalidText;
+                    return me.prjInvalidText;
                 } else {
                     return true;
                 }
