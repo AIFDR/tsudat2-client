@@ -175,7 +175,8 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
                         }
                     });
                 }
-            }
+            },
+            scope: this
         }];
 
         TsuDat2.LayerUploadPanel.superclass.initComponent.call(this);
