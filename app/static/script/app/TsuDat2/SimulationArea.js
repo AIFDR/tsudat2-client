@@ -532,8 +532,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     },
     
     persistFeature: function(e) {
-        // TODO remove the check for _sketch once this issue gets resolved in OpenLayers
-        if (this._commit || e.feature._sketch === true || e.type == "featureremoved" && !e.feature.fid) {
+        if (this._commit || e.type == "featureremoved" && !e.feature.fid) {
             return;
         }
         var url, method,
