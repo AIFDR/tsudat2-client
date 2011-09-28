@@ -1,5 +1,6 @@
 /*
  * @require TsuDat2.js
+ * @require TsuDat2/LayerUploadPanel.js
  */
 
 TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
@@ -173,6 +174,37 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             addActionText: this.elevationDataAddButtonText,
             instructionsText: this.elevationDataInstructions,
             startSourceId: this.demSource,
+            upload: true,
+            createUploadButton: function() {
+                return new Ext.Button({
+                    text: this.uploadText,
+                    iconCls: "gxp-icon-filebrowse",
+                    handler: function() {
+                        var panel = new TsuDat2.LayerUploadPanel({
+                            url: "/data/upload",
+                            width: 350,
+                            border: false,
+                            bodyStyle: "padding: 10px 10px 0 10px;",
+                            frame: true,
+                            labelWidth: 65,
+                            defaults: {
+                                anchor: "95%",
+                                allowBlank: false,
+                                msgTarget: "side"
+                            }
+                        });
+
+                        var win = new Ext.Window({
+                            title: this.uploadText,
+                            modal: true,
+                            resizable: false,
+                            items: [panel]
+                        });
+                        win.show();
+                    },
+                    scope: this
+                });
+            },
             outputConfig: {
                 modal: false,
                 listeners: {
