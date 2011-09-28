@@ -70,6 +70,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             fieldLabel: this.dbfLabel,
             name: 'dbf_file',
             hidden: true,
+            hideMode:'offsets',
             allowBlank: true,
             buttonText: "",
             buttonCfg: {
@@ -88,6 +89,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             fieldLabel: this.shxLabel,
             name: 'shx_file',
             hidden: true,
+            hideMode:'offsets',
             allowBlank: true,
             buttonText: "",
             buttonCfg: {
@@ -106,6 +108,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             fieldLabel: this.prjLabel,
             name: 'prj_file',
             hidden: true,
+            hideMode:'offsets',
             allowBlank: true,
             buttonText: "",
             buttonCfg: {
