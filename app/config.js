@@ -52,7 +52,7 @@ if (java.lang.System.getProperty("app.debug")) {
         if (geonode.charAt(geonode.length-1) !== "/") {
             geonode = geonode + "/";
         }
-        var geonodeUrls = ["data/acls", "accounts/", "tsudat-media/"];
+        var geonodeUrls = ["data/upload", "data/acls", "accounts/", "tsudat-media/"];
         var url;
         for (var i=geonodeUrls.length-1; i>=0; --i) {
             url = geonodeUrls[i];

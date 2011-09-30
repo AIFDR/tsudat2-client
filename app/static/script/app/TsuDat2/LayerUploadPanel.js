@@ -139,7 +139,8 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             allowBlank: true
         }, {
             xtype: "hidden",
-            name: "permissions"
+            name: "permissions",
+            value: '{"anonymous":"layer_readonly","users":[]}'
         }, {
             xtype: "hidden",
             name: "csrfmiddlewaretoken",
