@@ -6,7 +6,7 @@
 TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     
     /** i18n */
-    simulationAreaInstructions: "<b>Define the area for the tsunami simulation.</b> Draw or upload the area over which to run the simulation, add and rank elevetion data, then define the default mesh resolution.",
+    simulationAreaInstructions: "<b>Define the area for the tsunami simulation.</b> Draw or upload the area over which to run the simulation, add and rank elevation data, then define the default mesh resolution.",
     simulationAreaLabel: "Simulation Area",
     simulationAreaDrawButtonText: "Draw",
     simulationAreaImportButtonText: "Import",
