@@ -402,7 +402,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                     feature.layer.map.getProjectionObject(), epsg4326
                 );
                 this.parent.form.hazardPointCoords.setValue(
-                    format(geom.x, "lat") + ", " + format(geom.y, "lon")
+                    format(geom.x, "lon") + ", " + format(geom.y, "lat")
                 );
                 this.parent.showHazardPointGraph(feature);
             }
