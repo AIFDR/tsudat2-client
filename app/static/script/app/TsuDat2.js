@@ -243,6 +243,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             }
         }, {
             ptype: "app_scenario",
+            id: "scenario",
             eventHighlighter: "eventhighlighter",
             outputTarget: "step1",
             symbolizer: {
@@ -263,6 +264,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             }
         }, {
             ptype: "app_simulationarea",
+            id: "simulationarea",
             outputTarget: "step2",
             styleMap: new OpenLayers.StyleMap({
                 "default": new OpenLayers.Style({
@@ -373,6 +375,34 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             scope: this
         });
 
+    },
+
+    getProjectInfo: function() {
+        Ext.Ajax.request({
+            method: "GET",
+            url: "/tsudat/project/" + this.projectId,
+            success: function(response) {
+                var extProj = new OpenLayers.Projection("EPSG:4326");
+                var intProj = new OpenLayers.Projection(this.mapPanel.map.projection);
+                var features = new OpenLayers.Format.GeoJSON({internalProjection: intProj, externalProjection: extProj}).read(response.responseText);
+                this.tools["scenario"].setValid(true);
+                this.tools["simulationarea"].projectId = this.projectId;
+                // we want to be silent since we do not want to persist
+                this.tools["simulationarea"].vectorLayer.addFeatures(features, {silent: true});
+                this.tools["simulationarea"].setSimulationArea({feature: features[0]});
+                Ext.getCmp("step2").expand();
+            },
+            scope: this
+        });
+    },
+
+    loadConfig: function(config, callback) {
+        var params = OpenLayers.Util.getParameters();
+        if (params && params.project_id) {
+            this.projectId = parseInt(params.project_id);
+            this.getProjectInfo();
+        }
+        callback.call(this, config);
     },
     
     login: function(options) {
