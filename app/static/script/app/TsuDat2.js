@@ -308,7 +308,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                                     fillColor: "white"
                                 },
                                 "Point": {
-                                    pointRadius: 4,
+                                    pointRadius: 6,
                                     graphicName: "square",
                                     fillColor: "white",
                                     fillOpacity: 1,
