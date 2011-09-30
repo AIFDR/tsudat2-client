@@ -27,7 +27,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
     defaultSourceType: "gxp_wmscsource",
     
     constructor: function(config) {
-                
+
         Ext.applyIf(config.map, {
             id: "map",
             region: "center",
@@ -332,7 +332,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
         }];
 
         TsuDat2.superclass.constructor.apply(this, arguments);
-        
+
         this.addEvents(
             /** private: event[valid]
              *  Triggered when a wizard step is valid.
@@ -382,15 +382,18 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             method: "GET",
             url: "/tsudat/project/" + this.projectId,
             success: function(response) {
-                var extProj = new OpenLayers.Projection("EPSG:4326");
-                var intProj = new OpenLayers.Projection(this.mapPanel.map.projection);
-                var features = new OpenLayers.Format.GeoJSON({internalProjection: intProj, externalProjection: extProj}).read(response.responseText);
-                this.tools["scenario"].setValid(true);
-                this.tools["simulationarea"].projectId = this.projectId;
-                // we want to be silent since we do not want to persist
-                this.tools["simulationarea"].vectorLayer.addFeatures(features, {silent: true});
-                this.tools["simulationarea"].setSimulationArea({feature: features[0]});
-                Ext.getCmp("step2").expand();
+                this.mapPanel.on("afterlayeradd", function() {
+                    this.tools["scenario"].setValid(true);
+                    Ext.getCmp("step2").expand();
+                    var layer = this.tools["simulationarea"].vectorLayer;
+                    var extProj = new OpenLayers.Projection("EPSG:4326");
+                    var intProj = layer.map.getProjectionObject();
+                    var features = new OpenLayers.Format.GeoJSON({internalProjection: intProj, externalProjection: extProj}).read(response.responseText);
+                    this.tools["simulationarea"].projectId = this.projectId;
+                    // we want to be silent since we do not want to persist
+                    layer.addFeatures(features, {silent: true});
+                    this.tools["simulationarea"].setSimulationArea({feature: features[0]});
+                }, this, {single: true});
             },
             scope: this
         });
