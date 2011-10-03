@@ -30,6 +30,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     uploadFileLabel: "CSV file",
     uploadCrsLabel: "CRS",
     deleteButtonText: "Delete",
+    uploadText: "Upload",
     /** end i18n */
     
     ptype: "app_simulationarea",
@@ -115,6 +116,18 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         });
     },
 
+    demFilterBy: function(rec) {
+        var keywords = rec.get("keywords");
+        var matches = ["category:hazard", "subcategory:tsunami", "unit:m", "source:tsudat", "source:flow_depth"];
+        var matchCount = 0;
+        Ext.each(keywords, function(keyword, index) {
+            if (matches.indexOf(keyword) != -1) {
+                matchCount++;
+            }
+        });
+        return this.demStore.findExact("typename", rec.get("name")) != -1 && matchCount != 5;
+    },
+
     init: function(target) {
         TsuDat2.SimulationArea.superclass.init.apply(this, arguments);
 
@@ -175,7 +188,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             instructionsText: this.elevationDataInstructions,
             startSourceId: this.demSource,
             upload: true,
-            createUploadButton: function() {
+            createUploadButton: (function() {
                 return new Ext.Button({
                     text: this.uploadText,
                     iconCls: "gxp-icon-filebrowse",
@@ -191,6 +204,17 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                                 anchor: "95%",
                                 allowBlank: false,
                                 msgTarget: "side"
+                            },
+                            listeners: {
+                                uploadcomplete: function(panel, detail) {
+                                    var demSource = this.target.layerSources[this.demSource];
+                                    demSource.store.on("load", function() {
+                                        demSource.store.filterBy(this.demFilterBy, this);
+                                    }, this);
+                                    demSource.store.load({});
+                                    win.close();
+                                },
+                                scope: this
                             }
                         });
 
@@ -204,7 +228,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                     },
                     scope: this
                 });
-            },
+            }).createDelegate(this),
             outputConfig: {
                 modal: false,
                 listeners: {
@@ -212,17 +236,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                         this.setOtherAddLayerButtonsDisabled(true);
                         this.target.showTree();
                         var demSource = this.target.layerSources[this.demSource];
-                        demSource.store.filterBy(function(rec) {
-                            var keywords = rec.get("keywords");
-                            var matches = ["category:hazard", "subcategory:tsunami", "unit:m", "source:tsudat", "source:flow_depth"];
-                            var matchCount = 0;
-                            Ext.each(keywords, function(keyword, index) {
-                                if (matches.indexOf(keyword) != -1) {
-                                    matchCount++;
-                                }
-                            });
-                            return this.demStore.findExact("typename", rec.get("name")) != -1 && matchCount != 5;
-                        }, this);
+                        demSource.store.filterBy(this.demFilterBy, this);
                         origCreateLayerRecord = demSource.createLayerRecord;
                         demSource.createLayerRecord = (function() {
                             var rec = origCreateLayerRecord.apply(demSource, arguments);

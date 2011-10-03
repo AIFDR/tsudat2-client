@@ -155,8 +155,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
                         url: this.url,
                         waitMsg: this.waitMsg,
                         success: function(fp, o) {
-                            console.log(o);
-                            // TODO
+                            this.fireEvent("uploadcomplete", this);
                         },
                         failure: function(fp, o) {
                             var error_message = '<ul>';
@@ -173,12 +172,26 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
                                 icon: Ext.Msg.ERROR,
                                 buttons: Ext.Msg.OK
                             });
-                        }
+                        },
+                        scope: this
                     });
                 }
             },
             scope: this
         }];
+
+        this.addEvents(
+            /**
+             * Event: uploadcomplete
+             * Fires upon successful upload.
+             *
+             * Listener arguments:
+             * panel - {<gxp.LayerUploadPanel} This form panel.
+             * details - {Object} An object with "name" and "href" properties
+             *     corresponding to the uploaded layer name and resource href.
+             */
+            "uploadcomplete"
+        );
 
         TsuDat2.LayerUploadPanel.superclass.initComponent.call(this);
 
