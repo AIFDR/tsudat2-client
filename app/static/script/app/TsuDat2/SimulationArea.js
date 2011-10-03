@@ -207,12 +207,17 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                             },
                             listeners: {
                                 uploadcomplete: function(panel, detail) {
-                                    var demSource = this.target.layerSources[this.demSource];
-                                    demSource.store.on("load", function() {
-                                        demSource.store.filterBy(this.demFilterBy, this);
-                                    }, this);
-                                    demSource.store.load({});
-                                    win.close();
+                                    // first reload demStore (tsudat/data_set endpoint)
+                                    // when this is done, reload and filter GetCapabilities
+                                    this.demStore.on("load", function() {
+                                        var demSource = this.target.layerSources[this.demSource];
+                                        demSource.store.on("load", function() {
+                                            demSource.store.filterBy(this.demFilterBy, this);
+                                        }, this);
+                                        demSource.store.load({});
+                                        win.close();
+                                    }, this, {single: true});
+                                    this.demStore.reload();
                                 },
                                 scope: this
                             }

@@ -187,8 +187,6 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
              *
              * Listener arguments:
              * panel - {<gxp.LayerUploadPanel} This form panel.
-             * details - {Object} An object with "name" and "href" properties
-             *     corresponding to the uploaded layer name and resource href.
              */
             "uploadcomplete"
         );
