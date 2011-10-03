@@ -148,6 +148,27 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
         }];
 
         this.buttons = [{
+            text: "Permissions",
+            handler: function() {
+                new Ext.Window({
+                    title: "Permissions",
+                    resizable: false,
+                    width: 260,
+                    items: [{xtype: 'container', id: 'permissionsPanel'}]
+                }).show();
+                var editor = new GeoNode.PermissionsEditor({
+                    renderTo: 'permissionsPanel',
+                    userLookup: "/accounts/ajax_lookup",
+                    permissions: {"anonymous":"layer_readonly","users":[]},
+                    listeners: {
+                        updated: function(pe) {
+                            me.getForm().findField('permissions').setValue(Ext.util.JSON.encode(pe.writePermissions()));
+                        }
+                    }
+                });
+            },
+            scope: this
+        }, {
             text: this.uploadButtonText,
             handler: function(){
                 if (this.getForm().isValid()) {

@@ -10,6 +10,11 @@ OpenLayers.ImgPath = "externals/openlayers/theme/default/img/";
 // wrap the date line for our tiled base layers
 OpenLayers.Layer.XYZ.prototype.wrapDateLine = true;
 
+// TODO check with Andreas how to deal with GeoNode-client i18n
+var gettext = function(key) {
+    return key;
+};
+
 var TsuDat2 = Ext.extend(gxp.Viewer, {
     
     /** i18n */

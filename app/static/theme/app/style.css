@@ -1,3 +1,19 @@
+/* This should really be part of GeoNode-client */
+.x-btn .icon-adduser {
+    background-image: url(img/silk/add.png);
+}
+
+.x-btn .icon-removeuser {
+    background-image: url(img/silk/delete.png);
+}
+
+.user_item button {
+    height: 16px;
+    margin: 4px;
+    width: 16px;
+}
+/* end of GeoNode-client */
+
 /* setting font fixes combobox rendering issues in IE. See
  * http://extjs.com/forum/showthread.php?t=72505 */
 body {
