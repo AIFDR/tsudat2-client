@@ -38,6 +38,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
      */
     initComponent: function() {
         var me = this;
+        var initialPermissions = {"anonymous":"layer_readonly","users":[]};
         this.items = [{
             xtype: "textfield",
             name: "layer_title",
@@ -140,7 +141,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
         }, {
             xtype: "hidden",
             name: "permissions",
-            value: '{"anonymous":"layer_readonly","users":[]}'
+            value: Ext.util.JSON.encode(initialPermissions)
         }, {
             xtype: "hidden",
             name: "csrfmiddlewaretoken",
@@ -156,10 +157,11 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
                     width: 260,
                     items: [{xtype: 'container', id: 'permissionsPanel'}]
                 }).show();
+                var permissions = Ext.util.JSON.decode(me.getForm().findField('permissions').getValue());
                 var editor = new GeoNode.PermissionsEditor({
                     renderTo: 'permissionsPanel',
                     userLookup: "/accounts/ajax_lookup",
-                    permissions: {"anonymous":"layer_readonly","users":[]},
+                    permissions: permissions,
                     listeners: {
                         updated: function(pe) {
                             me.getForm().findField('permissions').setValue(Ext.util.JSON.encode(pe.writePermissions()));
