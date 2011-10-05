@@ -38,6 +38,12 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
      */
     initComponent: function() {
         var me = this;
+        var listeners = {
+            "fileselected": function(cmp, value) {
+                // remove the path from the filename - avoids C:/fakepath etc.
+                cmp.setValue(value.split(/[/\\]/).pop());
+            }
+        };
         var initialPermissions = {"anonymous":"layer_readonly","users":[]};
         this.items = [{
             xtype: "textfield",
@@ -55,6 +61,8 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             },
             listeners: {
                 "fileselected": function(cmp, value) {
+                    // remove the path from the filename - avoids C:/fakepath etc.
+                    cmp.setValue(value.split(/[/\\]/).pop());
                     var isSHP = (/\.shp$/i).test(value);
                     var fields = ["dbf_file", "shx_file", "prj_file"];
                     for (var key in fields) {
@@ -78,6 +86,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             buttonCfg: {
                 iconCls: "gxp-icon-filebrowse"
             },
+            listeners: listeners,
             validator: function(name) {
                 if ((name.length > 0) && (name.search(/\.dbf$/i) == -1)) {
                     return me.dbfInvalidText;
@@ -97,6 +106,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             buttonCfg: {
                 iconCls: "gxp-icon-filebrowse"
             },
+            listeners: listeners,
             validator: function(name) {
                 if ((name.length > 0) && (name.search(/\.shx$/i) == -1)) {
                     return me.shxInvalidText;
@@ -116,6 +126,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             buttonCfg: {
                 iconCls: "gxp-icon-filebrowse"
             },
+            listeners: listeners,
             validator: function(name) {
                 if ((name.length > 0) && (name.search(/\.prj$/i) == -1)) {
                     return me.prjInvalidText;
@@ -132,6 +143,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
             buttonCfg: {
                 iconCls: "gxp-icon-filebrowse"
             },
+            listeners: listeners,
             allowBlank: true
         }, {
             xtype: "textfield",
