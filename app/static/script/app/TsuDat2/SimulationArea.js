@@ -813,7 +813,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         e.feature.attributes.type = this.internalPolygonType;
         // everything except area of interest has a value
         if (this.internalPolygonType != 3) {
-            e.feature.attributes.value = 0;
+            if (this.internalPolygonType === 1) {
+                e.feature.attributes.value = 1000;
+            } else if (this.internalPolygonType === 2) {
+                e.feature.attributes.value = 0.01;
+            }
         }
     },
     
