@@ -155,7 +155,15 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             // we want to be silent since we do not want to persist again
             this.vectorLayer.addFeatures(features, {silent: true});
             // TODO this is using a private function
-            this.featureStore.onFeaturesAdded({features: features});
+            this.featureStore.onFeaturesAdded({features: features}); console.log(this.wizardData);
+            // TODO I see no way currently to retrieve value for bounding_polygon_maxarea
+            this.setValid(true, {
+                project: this.projectId,
+                default_friction_value: this.form.meshFriction.getValue(),
+                bounding_polygon_maxarea: this.form.meshResolution.getValue()
+            });
+            // TODO since no DEM layer is present, setValid will only work once and not when
+            // switching accordion panels
         }, this, {single: true});
     },
 
