@@ -91,6 +91,18 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                     this.form.returnPeriod.setValue(scenario.fields.return_period);
                     this.form.waveHeight.setValue(scenario.fields.wave_height);
                     this.form.waveHeightDelta.setValue(scenario.fields.wave_height_delta);
+                    var sourceZone = this.form.sourceZone;
+                    var rec = sourceZone.store.getById(scenario.fields.source_zone);
+                    sourceZone.setValue(rec.get("source_zone"));
+                    var event = scenario.fields.event;
+                    this.setValid(true, {
+                        hazard_point: scenario.fields.hazard_point,
+                        source_zone: scenario.fields.source_zone,
+                        wave_height_delta: scenario.fields.wave_height_delta,
+                        wave_height: scenario.fields.wave_height,
+                        return_period: scenario.fields.return_period,
+                        event: event
+                    });
                 }, this);
             }, this, {single: true});
         }
