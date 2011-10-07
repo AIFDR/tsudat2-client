@@ -58,9 +58,34 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
      *  ``Number`` The id of the current scenario
      */
     scenarioId: null,
+
+    loadGaugePoints: function(response) {
+        // we need to wait for the baseLayer to be there
+        this.target.mapPanel.on("afterlayeradd", function() {
+            var format = new OpenLayers.Format.GeoJSON({
+                externalProjection: new OpenLayers.Projection("EPSG:4326"),
+                internalProjection: this.target.mapPanel.map.getProjectionObject()
+            });
+            var features = format.read(response.responseText);
+            // we want to be silent since we do not want to persist again
+            this.vectorLayer.addFeatures(features, {silent: true});
+            // TODO this is using a private function
+            this.featureStore.onFeaturesAdded({features: features});
+        }, this, {single: true});
+    },
     
     init: function(target) {
         TsuDat2.GenerateSimulation.superclass.init.apply(this, arguments);
+
+        if (this.projectId !== null) {
+            Ext.Ajax.request({
+                method: "GET",
+                url: "/tsudat/gauge_point/",
+                params: {project: this.projectId},
+                success: this.loadGaugePoints,
+                scope: this
+            });
+        }
 
         this.vectorLayer = new OpenLayers.Layer.Vector(this.id + "_vectorlayer", {
             projection: new OpenLayers.Projection("EPSG:4326"),

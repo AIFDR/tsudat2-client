@@ -336,9 +336,11 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             )})
         }, {
             ptype: "app_simulationparameters",
+            projectId: projectId,
             outputTarget: "step3"
         }, {
             ptype: "app_generatesimulation",
+            projectId: projectId,
             outputTarget: "step4"
         }];
 
