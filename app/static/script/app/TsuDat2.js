@@ -15,6 +15,12 @@ var gettext = function(key) {
     return key;
 };
 
+var projectId = null;
+var params = OpenLayers.Util.getParameters();
+if (params && params.project_id) {
+    projectId = parseInt(params.project_id);
+}
+
 var TsuDat2 = Ext.extend(gxp.Viewer, {
     
     /** i18n */
@@ -248,7 +254,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             }
         }, {
             ptype: "app_scenario",
-            id: "scenario",
+            projectId: projectId,
             eventHighlighter: "eventhighlighter",
             outputTarget: "step1",
             symbolizer: {
@@ -269,8 +275,8 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             }
         }, {
             ptype: "app_simulationarea",
-            id: "simulationarea",
             outputTarget: "step2",
+            projectId: projectId,
             styleMap: new OpenLayers.StyleMap({
                 "default": new OpenLayers.Style({
                     strokeColor: "white",
@@ -382,37 +388,6 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
 
     },
 
-    getProjectInfo: function() {
-        Ext.Ajax.request({
-            method: "GET",
-            url: "/tsudat/project/" + this.projectId,
-            success: function(response) {
-                this.mapPanel.on("afterlayeradd", function() {
-                    this.tools["scenario"].setValid(true);
-                    Ext.getCmp("step2").expand();
-                    var layer = this.tools["simulationarea"].vectorLayer;
-                    var extProj = new OpenLayers.Projection("EPSG:4326");
-                    var intProj = layer.map.getProjectionObject();
-                    var features = new OpenLayers.Format.GeoJSON({internalProjection: intProj, externalProjection: extProj}).read(response.responseText);
-                    this.tools["simulationarea"].projectId = this.projectId;
-                    // we want to be silent since we do not want to persist
-                    layer.addFeatures(features, {silent: true});
-                    this.tools["simulationarea"].setSimulationArea({feature: features[0]});
-                }, this, {single: true});
-            },
-            scope: this
-        });
-    },
-
-    loadConfig: function(config, callback) {
-        var params = OpenLayers.Util.getParameters();
-        if (params && params.project_id) {
-            this.projectId = parseInt(params.project_id);
-            this.getProjectInfo();
-        }
-        callback.call(this, config);
-    },
-    
     login: function(options) {
         var submit = function() {
             form.getForm().submit({

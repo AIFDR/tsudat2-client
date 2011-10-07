@@ -60,12 +60,40 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
     currentGridParams: null,
 
     init: function(target) {
+
+        if (this.projectId !== null) {
+            Ext.Ajax.request({
+                method: "GET",
+                url: "/tsudat/scenario/",
+                params: {project: this.projectId},
+                success: this.loadParams,
+                scope: this
+            });
+        }
+
         this.initHazardPointManagement(target);
         this.initSubfaultManagement(target);
         
         target.tools[this.eventHighlighter].showLayer();
 
         TsuDat2.Scenario.superclass.init.apply(this, arguments);
+    },
+
+    loadParams: function(response) {
+        var scenarios = Ext.util.JSON.decode(response.responseText);
+        if (scenarios && scenarios.length >= 1) {
+            var scenario = scenarios[0];
+            var filter = new OpenLayers.Filter.FeatureId({fids: [scenario.fields.hazard_point]});
+            var hazardPointManager = this.target.tools[this.id + "hazardpointmanager"];
+            hazardPointManager.on("layerchange", function() {
+                hazardPointManager.loadFeatures(filter, function(features) {
+                    this.selectHazardPoint.select(features[0]);
+                    this.form.returnPeriod.setValue(scenario.fields.return_period);
+                    this.form.waveHeight.setValue(scenario.fields.wave_height);
+                    this.form.waveHeightDelta.setValue(scenario.fields.wave_height_delta);
+                }, this);
+            }, this, {single: true});
+        }
     },
     
     activate: function() {

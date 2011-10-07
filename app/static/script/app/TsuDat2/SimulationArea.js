@@ -128,8 +128,33 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         return this.demStore.findExact("typename", rec.get("name")) != -1 && matchCount != 5;
     },
 
+    loadExistingSimulationArea: function(response) {
+        // we need to wait for the baseLayer to be there
+        this.target.mapPanel.on("afterlayeradd", function() {
+            // we need to expand otherwise vectorLayer is not added to the map
+            Ext.getCmp(this.outputTarget).expand();
+            var format = new OpenLayers.Format.GeoJSON({
+                externalProjection: new OpenLayers.Projection("EPSG:4326"),
+                internalProjection: this.vectorLayer.map.getProjectionObject()
+            });
+            var features = format.read(response.responseText);
+            // we want to be silent since we do not want to persist again
+            this.vectorLayer.addFeatures(features, {silent: true});
+            this.setSimulationArea({feature: features[0]});
+        }, this, {single: true});
+    },
+
     init: function(target) {
         TsuDat2.SimulationArea.superclass.init.apply(this, arguments);
+
+        if (this.projectId !== null) {
+            Ext.Ajax.request({
+                method: "GET",  
+                url: "/tsudat/project/" + this.projectId,
+                success: this.loadExistingSimulationArea,
+                scope: this
+            });
+        }
 
         this.vectorLayer = new OpenLayers.Layer.Vector(this.id + "_vectorlayer", {
             styleMap: this.styleMap,
