@@ -180,6 +180,9 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                         listeners: {
                             "load": {
                                 fn: function(store) {
+                                    if (this.projectId !== null) {
+                                        return;
+                                    }
                                     var rpField = this.form.returnPeriod;
                                     var returnPeriod = store.getAt(0).get(rpField.valueField);
                                     rpField.setValue(returnPeriod);
