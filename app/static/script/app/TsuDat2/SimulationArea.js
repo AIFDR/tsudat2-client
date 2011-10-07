@@ -155,7 +155,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             // we want to be silent since we do not want to persist again
             this.vectorLayer.addFeatures(features, {silent: true});
             // TODO this is using a private function
-            this.featureStore.onFeaturesAdded({features: features}); console.log(this.wizardData);
+            this.featureStore.onFeaturesAdded({features: features}); 
             // TODO I see no way currently to retrieve value for bounding_polygon_maxarea
             this.setValid(true, {
                 project: this.projectId,
