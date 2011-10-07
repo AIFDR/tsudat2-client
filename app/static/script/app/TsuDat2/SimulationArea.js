@@ -131,16 +131,31 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     loadExistingSimulationArea: function(response) {
         // we need to wait for the baseLayer to be there
         this.target.mapPanel.on("afterlayeradd", function() {
-            // we need to expand otherwise vectorLayer is not added to the map
-            Ext.getCmp(this.outputTarget).expand();
             var format = new OpenLayers.Format.GeoJSON({
                 externalProjection: new OpenLayers.Projection("EPSG:4326"),
-                internalProjection: this.vectorLayer.map.getProjectionObject()
+                internalProjection: this.target.mapPanel.map.getProjectionObject()
             });
             var features = format.read(response.responseText);
             // we want to be silent since we do not want to persist again
             this.vectorLayer.addFeatures(features, {silent: true});
             this.setSimulationArea({feature: features[0]});
+            this.form.drawInternalPolygon.enable();
+            this.form.importInternalPolygon.enable();
+        }, this, {single: true});
+    },
+
+    loadInternalPolygons: function(response) {
+        // we need to wait for the baseLayer to be there
+        this.target.mapPanel.on("afterlayeradd", function() {
+            var format = new OpenLayers.Format.GeoJSON({
+                externalProjection: new OpenLayers.Projection("EPSG:4326"),
+                internalProjection: this.target.mapPanel.map.getProjectionObject()
+            });         
+            var features = format.read(response.responseText);
+            // we want to be silent since we do not want to persist again
+            this.vectorLayer.addFeatures(features, {silent: true});
+            // TODO this is using a private function
+            this.featureStore.onFeaturesAdded({features: features});
         }, this, {single: true});
     },
 
@@ -152,6 +167,13 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 method: "GET",  
                 url: "/tsudat/project/" + this.projectId,
                 success: this.loadExistingSimulationArea,
+                scope: this
+            });
+            Ext.Ajax.request({
+                method: "GET",
+                url: "/tsudat/internal_polygon/",
+                params: {project: this.projectId},
+                success: this.loadInternalPolygons,
                 scope: this
             });
         }
