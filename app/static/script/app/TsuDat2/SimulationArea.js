@@ -141,6 +141,18 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             this.setSimulationArea({feature: features[0]});
             this.form.drawInternalPolygon.enable();
             this.form.importInternalPolygon.enable();
+
+            // first reload demStore (tsudat/data_set endpoint)
+            // when this is done, reload and filter GetCapabilities
+            this.demStore.on("load", function() {
+                var demSource = this.target.layerSources[this.demSource];
+                demSource.store.on("load", function() {
+                    demSource.store.filterBy(this.demFilterBy, this);
+                }, this);
+                demSource.store.load({});
+            }, this, {single: true});
+            this.demStore.reload();
+
         }, this, {single: true});
     },
 
