@@ -188,6 +188,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             }
             var demSource = this.target.layerSources[this.demSource];
             demSource.store.on("load", function() {
+                // we do not want to persist the DEMs again
+                this._ignore = true;
                 demSource.store.filterBy(this.demFilterBy, this);
                 demSource.store.each(function(record) {
                     if (typeNames.indexOf(record.get('name')) !== -1) {
@@ -195,6 +197,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                         this.target.mapPanel.layers.add(record);
                     }
                 }, this);
+                delete this._ignore;
             }, this);
             demSource.store.load({});
         }, this, {single: true});
@@ -940,6 +943,10 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     },
     
     saveDems: function(store, records) {
+        // loading an existing project, do not persist
+        if (this._ignore === true) {
+            return;
+        }
         if (!Ext.isArray(records)) {
             records = [records];
         }
