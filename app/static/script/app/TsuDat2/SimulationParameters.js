@@ -19,7 +19,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
     
     addOutput: function(config) {
         var data; // result data
-        var output = TsuDat2.SimulationParameters.superclass.addOutput.call(this, {
+        var output = (this.form = TsuDat2.SimulationParameters.superclass.addOutput.call(this, {
             xtype: "form",
             labelWidth: 80,
             monitorValid: true,
@@ -40,6 +40,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                 items: [{
                     xtype: "numberfield",
                     name: "initial_tidal_stage",
+                    ref: "../tide",
                     value: 0,
                     width: 60,
                     allowBlank: false
@@ -55,6 +56,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                 items: [{
                     xtype: "numberfield",
                     name: "start_time",
+                    ref: "../startTime",
                     value: 0,
                     width: 60,
                     allowBlank: false
@@ -70,6 +72,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                 items: [{
                     xtype: "numberfield",
                     name: "end_time",
+                    ref: "../endTime",
                     value: 3600,
                     width: 60,
                     allowBlank: false
@@ -82,6 +85,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                 xtype: "numberfield",
                 fieldLabel: this.smoothingLabel,
                 name: "smoothing_param",
+                ref: "smoothing",
                 width: 60,
                 anchor: null,
                 value: 0.1,
@@ -89,6 +93,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
             }, {
                 xtype: "radiogroup",
                 name: "model_setup",
+                ref: "modelSetup",
                 fieldLabel: this.modelSetupLabel,
                 columns: 1,
                 items: [{
@@ -118,7 +123,14 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                 },
                 scope: this
             }
-        });
+        }));
+        this.wizardContainer.on("wizardstepvalid", function(tool, data) {
+            this.form.tide.setValue(data.initial_tidal_stage);
+            this.form.startTime.setValue(data.start_time);
+            this.form.endTime.setValue(data.end_time);
+            this.form.smoothing.setValue(data.smoothing_param);
+            this.form.modelSetup.onSetValue(data.model_setup);
+        }, this, {single: true});
         return output;
     }
     
