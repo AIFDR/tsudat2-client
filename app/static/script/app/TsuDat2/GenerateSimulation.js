@@ -317,7 +317,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
             }
         });
 
-        this.wizardContainer.on("wizardstepvalid", function(tool, data) {
+        this.projectId !== null && this.wizardContainer.on("wizardstepvalid", function(tool, data) {
             this.form.scenarioName.setValue(data.name);
             this.form.rasterResolution.setValue(data.raster_resolution);
             var values = [];

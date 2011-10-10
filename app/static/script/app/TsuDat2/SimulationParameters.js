@@ -124,7 +124,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                 scope: this
             }
         }));
-        this.wizardContainer.on("wizardstepvalid", function(tool, data) {
+        this.projectId !== null && this.wizardContainer.on("wizardstepvalid", function(tool, data) {
             this.form.tide.setValue(data.initial_tidal_stage);
             this.form.startTime.setValue(data.start_time);
             this.form.endTime.setValue(data.end_time);
