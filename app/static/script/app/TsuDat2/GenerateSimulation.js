@@ -143,6 +143,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
             },
             items: [{
                 xtype: "textfield",
+                ref: "scenarioName",
                 fieldLabel: this.scenarioNameLabel,
                 allowBlank: false,
                 name: "name"
@@ -156,12 +157,14 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
             }, {
                 xtype: "radio",
                 name: "use_aoi",
+                ref: "useSimulationArea",
                 hideLabel: true,
                 boxLabel: this.simulationAreaLabel,
                 checked: true
             }, {
                 xtype: "radio",
                 name: "use_aoi",
+                ref: "useAreaOfInterest",
                 hideLabel: true,
                 boxLabel: this.areaOfInterestLabel
             }, {
@@ -173,6 +176,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                     value: 25,
                     width: 60,
                     name: "raster_resolution",
+                    ref: "../rasterResolution",
                     allowBlank: false
                 }, {
                     xtype: "label",
@@ -189,6 +193,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
             }, {
                 xtype: "checkboxgroup",
                 name: "output_layers",
+                ref: "outputLayers",
                 hideLabel: true,
                 columns: 1,
                 items: [{
@@ -311,6 +316,18 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                 scope: this
             }
         });
+
+        this.wizardContainer.on("wizardstepvalid", function(tool, data) {
+            this.form.scenarioName.setValue(data.name);
+            this.form.rasterResolution.setValue(data.raster_resolution);
+            var values = [];
+            for (var i=0, len=this.form.outputLayers.items.length; i<len; i++) {
+                values.push(data.output_layers.indexOf(i) !== -1);
+            }
+            this.form.outputLayers.setValue(values);
+            this.form.useAreaOfInterest.setValue(data.use_aoi);
+            this.form.useSimulationArea.setValue(!data.use_aoi);
+        }, this, {single: true});
         
         this.wizardContainer.on("wizardstepexpanded", function(index) {
             if (index >= this.index) {

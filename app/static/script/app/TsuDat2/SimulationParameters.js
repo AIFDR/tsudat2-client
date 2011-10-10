@@ -130,6 +130,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
             this.form.endTime.setValue(data.end_time);
             this.form.smoothing.setValue(data.smoothing_param);
             this.form.modelSetup.onSetValue(data.model_setup);
+            this.setValid(true, data);
         }, this, {single: true});
         return output;
     }
