@@ -141,18 +141,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             this.setSimulationArea({feature: features[0]});
             this.form.drawInternalPolygon.enable();
             this.form.importInternalPolygon.enable();
-
-            // first reload demStore (tsudat/data_set endpoint)
-            // when this is done, reload and filter GetCapabilities
-            this.demStore.on("load", function() {
-                var demSource = this.target.layerSources[this.demSource];
-                demSource.store.on("load", function() {
-                    demSource.store.filterBy(this.demFilterBy, this);
-                }, this);
-                demSource.store.load({});
-            }, this, {single: true});
-            this.demStore.reload();
-
         }, this, {single: true});
     },
 
@@ -182,6 +170,37 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         }, this, {single: true});
     },
 
+    loadDEM: function(response) {
+        // first reload demStore (tsudat/data_set endpoint)
+        // when this is done, reload and filter GetCapabilities
+        this.demStore.on("load", function() {
+            var dsInfo = Ext.decode(response.responseText);
+            var typeNames = [];
+            if (dsInfo) {
+                for (var i=0, len=dsInfo.length; i<len; i++) {
+                    var ds = dsInfo[i].fields.dataset;
+                    var idx = this.demStore.findBy(function(record) {
+                        return (record.json.pk === ds);
+                    });
+                    var record = this.demStore.getAt(idx); 
+                    typeNames.push(record.get('typename'));
+                }
+            }
+            var demSource = this.target.layerSources[this.demSource];
+            demSource.store.on("load", function() {
+                demSource.store.filterBy(this.demFilterBy, this);
+                demSource.store.each(function(record) {
+                    if (typeNames.indexOf(record.get('name')) !== -1) {
+                        record.set("group", this.demLayerGroup);
+                        this.target.mapPanel.layers.add(record);
+                    }
+                }, this);
+            }, this);
+            demSource.store.load({});
+        }, this, {single: true});
+        this.demStore.reload();
+    },
+
     init: function(target) {
         TsuDat2.SimulationArea.superclass.init.apply(this, arguments);
 
@@ -197,6 +216,13 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 url: "/tsudat/internal_polygon/",
                 params: {project: this.projectId},
                 success: this.loadInternalPolygons,
+                scope: this
+            });
+            Ext.Ajax.request({
+                method: "GET",
+                url: "tsudat/project_data_set/",
+                params: {project_id: this.projectId},
+                success: this.loadDEM,
                 scope: this
             });
         }
