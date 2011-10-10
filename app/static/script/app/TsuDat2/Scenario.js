@@ -101,6 +101,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                         wave_height_delta: scenario.fields.wave_height_delta,
                         wave_height: scenario.fields.wave_height,
                         return_period: scenario.fields.return_period,
+                        default_friction_value: scenario.fields.default_friction_value,
                         event: event
                     });
                 }, this);
