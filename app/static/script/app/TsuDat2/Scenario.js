@@ -95,6 +95,20 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                     var rec = sourceZone.store.getById(scenario.fields.source_zone);
                     sourceZone.setValue(rec.get("source_zone"));
                     this.setValid(true, scenario.fields);
+                    var eventRecord = null;
+                    this.form.eventGrid.store.on('load', function() {
+                        this.form.eventGrid.store.each(function(record) {
+                            if (record.get('id') === scenario.fields.event) {
+                                eventRecord = record;
+                                return false;
+                            }
+                        });
+                        if (eventRecord !== null) {
+                            this._silent = true;
+                            this.form.eventGrid.getSelectionModel().selectRecords([eventRecord]);
+                            delete this._silent;
+                        }
+                    }, this);
                 }, this);
             }, this, {single: true});
         }
@@ -365,7 +379,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                                         })
                                     );
                                 }
-                                this.setValid(true, {
+                                (this._silent !== true) && this.setValid(true, {
                                     hazard_point: Number(this.hazardPoint.fid.split(".").pop()),
                                     source_zone: sz.store.getAt(sz.store.findExact("source_zone", sz.getValue())).id,
                                     wave_height_delta: this.form.waveHeightDelta.getValue(),
