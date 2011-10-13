@@ -68,9 +68,9 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
             });
             var features = format.read(response.responseText);
             // we want to be silent since we do not want to persist again
-            this.vectorLayer.addFeatures(features, {silent: true});
-            // TODO this is using a private function
-            this.featureStore.onFeaturesAdded({features: features});
+            this._silent = true;
+            this.vectorLayer.addFeatures(features);
+            delete this._silent;
         }, this, {single: true});
     },
     
@@ -327,7 +327,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     },
     
     persistFeature: function(e) {
-        if (this._commit || e.type == "featureremoved" && !e.feature.fid) {
+        if (this._silent || this._commit || e.type == "featureremoved" && !e.feature.fid) {
             return;
         }
         var method,
