@@ -105,8 +105,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
         this.featureStore = new GeoExt.data.FeatureStore({
             layer: this.vectorLayer,
             fields: [
-                {name: "name", type: "string"},
-                {name: "elevation", type: "float"}
+                {name: "name", type: "string"}
             ]
         });
         this.modifyControl = new OpenLayers.Control.ModifyFeature(
@@ -256,19 +255,6 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                         xtype: "textfield"
                     }
                 }, {
-                    dataIndex: "elevation",
-                    header: this.gaugePointElevationHeader,
-                    width: 70,
-                    editor: {
-                        xtype: "numberfield"
-                    }
-                }, {
-                    header: this.gaugePointUnitHeader,
-                    width: 40,
-                    renderer: function() {
-                        return "m";
-                    }
-                }, {
                     xtype: "actioncolumn",
                     width: 30,
                     fixed: true,
@@ -398,7 +384,6 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     
     setGaugePointAttributes: function(e) {
         e.feature.attributes.name = "";
-        e.feature.attributes.elevation = 0;
         e.feature.attributes.project_id = this.wizardData.project;
     },
     
