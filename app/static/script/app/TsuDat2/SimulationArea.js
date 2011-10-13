@@ -138,6 +138,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             var features = format.read(response.responseText);
             // we want to be silent since we do not want to persist again
             this.vectorLayer.addFeatures(features, {silent: true});
+            this.form.meshResolution.setValue(features[0].attributes.max_area);
             this.setSimulationArea({feature: features[0]});
             this.form.drawInternalPolygon.enable();
             this.form.importInternalPolygon.enable();
@@ -158,9 +159,6 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             this.featureStore.onFeaturesAdded({features: features}); 
             this.wizardContainer.on("wizardstepvalid", function(tool, data) {
                 this.form.meshFriction.setValue(data.default_friction_value);
-                // TODO I see no way currently to retrieve value for bounding_polygon_maxarea
-                // TODO since no DEM layer is present, setValid will only work once and not when
-                // switching accordion panels
                 this.setValid(true, {
                     project: this.projectId,
                     default_friction_value: this.form.meshFriction.getValue(),
@@ -474,6 +472,12 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 items: [{
                     xtype: "numberfield",
                     ref: "../meshResolution",
+                    listeners: {
+                        "change": function() {
+                            this.persistFeature({type: "featuremodified", feature: this.simulationArea});
+                        },
+                        scope: this
+                    },
                     allowBlank: false,
                     value: 1000000,
                     minValue: 1,
@@ -717,6 +721,9 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         }
         var json;
         if (method != "DELETE") {
+            if (!isInternalPolygon) {
+                feature.attributes.max_area = this.form.meshResolution.getValue();
+            }
             feature.attributes.project_id = this.projectId;
             // casting attributes to string because api does not like numbers
             var clone = feature.clone();
@@ -902,7 +909,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     setSimulationArea: function(e) {
         this.vectorLayer.events.unregister("featureadded", this, this.setSimulationArea);
         e.feature.attributes.name = "";
-        e.feature.attributes.max_area = 0;
+        e.feature.attributes.max_area = this.form.meshResolution.getValue();
         this.simulationArea = e.feature;
         this.drawControl.deactivate();
         this._toggling || this.modifyControl.selectControl.select(e.feature);
