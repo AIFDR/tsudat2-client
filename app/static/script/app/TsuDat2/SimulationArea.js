@@ -136,9 +136,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 internalProjection: this.target.mapPanel.map.getProjectionObject()
             });
             var features = format.read(response.responseText);
+            if (features[0].attributes.max_area >= this.form.meshResolution.minValue) {
+                this.form.meshResolution.setValue(features[0].attributes.max_area);
+            }
             // we want to be silent since we do not want to persist again
             this.vectorLayer.addFeatures(features, {silent: true});
-            this.form.meshResolution.setValue(features[0].attributes.max_area);
             this.setSimulationArea({feature: features[0]});
             this.form.drawInternalPolygon.enable();
             this.form.importInternalPolygon.enable();
@@ -154,9 +156,9 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             });         
             var features = format.read(response.responseText);
             // we want to be silent since we do not want to persist again
-            this.vectorLayer.addFeatures(features, {silent: true});
-            // TODO this is using a private function
-            this.featureStore.onFeaturesAdded({features: features}); 
+            this._silent = true;
+            this.vectorLayer.addFeatures(features);
+            delete this._silent;
             this.wizardContainer.on("wizardstepvalid", function(tool, data) {
                 this.form.meshFriction.setValue(data.default_friction_value);
                 this.setValid(true, {
@@ -686,7 +688,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     },
     
     persistFeature: function(e) {
-        if (this._commit || e.type == "featureremoved" && !e.feature.fid) {
+        if (this._silent || this._commit || e.type == "featureremoved" && !e.feature.fid) {
             return;
         }
         var url, method,
