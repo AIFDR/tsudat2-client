@@ -223,7 +223,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             });
             Ext.Ajax.request({
                 method: "GET",
-                url: "tsudat/project_data_set/",
+                url: "/tsudat/project_data_set/",
                 params: {project_id: this.projectId},
                 success: this.loadDEM,
                 scope: this
