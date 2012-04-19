@@ -20,6 +20,7 @@ var params = OpenLayers.Util.getParameters();
 if (params && params.project_id) {
     projectId = parseInt(params.project_id);
 }
+GeoExt.Lang.set(params.lang || "en");
 
 var TsuDat2 = Ext.extend(gxp.Viewer, {
     
@@ -95,7 +96,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                             }
                         }]
                     }
-                }, "-", "-", "->", {
+                }, "-", "-", {id: 'language', xtype: "container"}, "->", {
                     xtype: "tbtext",
                     ref: "loginName",
                     text: ""
@@ -228,6 +229,9 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             ptype: "gxp_zoomtolayerextent",
             closest: false,
             actionTarget: ["tree.tbar", "tree.contextMenu"]
+        }, {
+            ptype: "app_language",
+            outputTarget: "language"
         }, {
             outputTarget: "west",
             outputConfig: {

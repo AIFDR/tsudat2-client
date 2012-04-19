@@ -26,6 +26,10 @@ GeoExt.Lang.add("en", {
         slipTooltip: "Slip",
         selectEventInstructions: "<b>Select one of the {0} events</b> for the tsunami scenario:",
         loadingEventsMsg: "Loading the events valid for this set of parameters..."
+    },
+
+    "TsuDat2.plugins.Language.prototype": {
+        emptyText: "Select language"
     }
 
 });
