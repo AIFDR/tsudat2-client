@@ -231,6 +231,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             actionTarget: ["tree.tbar", "tree.contextMenu"]
         }, {
             ptype: "app_language",
+            languages: [["en", "English"], ["id", "Bahasa Indonesia"]],
             outputTarget: "language"
         }, {
             outputTarget: "west",

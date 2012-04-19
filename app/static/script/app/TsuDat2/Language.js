@@ -7,12 +7,14 @@ TsuDat2.plugins.Language = Ext.extend(gxp.plugins.Tool, {
     /** api: ptype = app_language */
     ptype: "app_language",
 
+    languages: null,
+
     /** api: method[addOutput]
      */
     addOutput: function(config) {
         return TsuDat2.plugins.Language.superclass.addOutput.call(this, {
             xtype: "combo",
-            store: [["en", "English"], ["id", "Indonesian"]],
+            store: this.languages,
             mode: 'local',
             emptyText: this.emptyText,
             value: GeoExt.Lang.locale,
