@@ -2,30 +2,30 @@ GeoExt.Lang.add("id", {
 
     "TsuDat2.prototype": {
         layersTabTitle: "Layers",
-        legendTabTitle: "Legend",
-        step1Title: "Step 1. Tsunami Scenario",
-        step2Title: "Step 2. Tsunami Simulation Area",
-        step3Title: "Step 3. Simulation Parameters",
-        step4Title: "Step 4. Generate Tsunami Simulation",
-        errorTitle: "Error",
+        legendTabTitle: "Legenda",
+        step1Title: "Tahap 1. Membuat skenario simulasi tsunami",
+        step2Title: "Tahap 2. Menentukan wilayah simulasi tsunami",
+        step3Title: "Tahap 3. Menentukan parameter simulasi",
+        step4Title: "Tahap 4. Pacu simulasi tsunami",
+        errorTitle: "Ada yang salah!",
         errorMsg: "{0}: {1}",
-        unknownErrorMsg: "The server returned an error: {0} {1}"
+        unknownErrorMsg: "Terdapat kesalahan pada server: {0} {1}"
     },
 
     "TsuDat2.Scenario.prototype": {
-        hazardPointLabel: "Hazard Point",
-        hazardPointEmptyText: "Select from map",
-        returnPeriodLabel: "Return Period",
-        waveHeightLabel: "Wave Height",
-        sourceDescription: "<b>Additionally, define the hazard source for the tsunami simulation.</b> Choose from the options below or select a sub-fault from the map.",
-        sourceLabel: "Source",
-        eventGridInstructions: "Once the tsunami scenario has been defined and a hazard source selected, a table below will be populated with the events valid for this set of parameters.",
-        probabilityTooltip: "Probability",
-        waveHeightTooltip: "Wave Height",
-        magnitudeTooltip: "Magnitude",
+        hazardPointLabel: "Koordinat Titik tinjau bahaya tsunami",
+        hazardPointEmptyText: "Pilih koordinat titik tinjau bahaya tsunami dari peta",
+        returnPeriodLabel: "Perioda ulang",
+        waveHeightLabel: "Tinggi gelombang",
+        sourceDescription: "<b>Informasi tambahan, definisikan sumber bahaya tsunami untuk simulasi.</b> Pilih dari beberapa pilihan berikut atau pilih sebuah segmen kecil dari peta",
+        sourceLabel: "Sumber",
+        eventGridInstructions: "Setelah skenario simulasi model tsunami ditentukan dan sebuah sumber gempa penyebab tsunami dipilih, tabel di bawah ini akan akan menyajikan kejadian-kejadian yang sesuai dengan parameter yang diinginkan",
+        probabilityTooltip: "Probabilitas",
+        waveHeightTooltip: "Tinggi gelombang tsunami",
+        magnitudeTooltip: "Magnitudo",
         slipTooltip: "Slip",
-        selectEventInstructions: "<b>Select one of the {0} events</b> for the tsunami scenario:",
-        loadingEventsMsg: "Loading the events valid for this set of parameters..."
+        selectEventInstructions: "<b>Pilih salah satu dari {0} kejadian-kejadian berikut ini</b> sebagai skenario model tsunami:",
+        loadingEventsMsg: "Sedang memuat kejadian-kejadian yang sesuai dengan parameter yang diinginkan..."
     },
 
     "TsuDat2.plugins.Language.prototype": {
