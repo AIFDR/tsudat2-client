@@ -19,6 +19,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
     selectEventInstructions: "<b>Select one of the {0} events</b> for the tsunami scenario:",
     loadingEventsMsg: "Loading the events valid for this set of parameters...",
     hazardPointPopupTitle: "Wave Height versus Return Period",
+    hazardPointInstructions: "<b>Define the scenario for the tsunami simulation.</b> First, select a hazard point from within the simulation area. Then, define the return period or wave height range.",
     /** end i18n */
     
     ptype: "app_scenario",
@@ -145,7 +146,7 @@ TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
                     tag: "p",
                     cls: "x-form-item"
                 },
-                html: "<b>Define the scenario for the tsunami simulation.</b> First, select a hazard point from within the simulation area. Then, define the return period or wave height range."
+                html: this.hazardPointInstructions
             }, {
                 xtype: "textfield",
                 ref: "hazardPointCoords",

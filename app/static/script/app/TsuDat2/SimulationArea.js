@@ -31,6 +31,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     uploadCrsLabel: "CRS",
     deleteButtonText: "Delete",
     uploadText: "Upload",
+    orText: "or",
+    aText: "a",
     /** end i18n */
     
     ptype: "app_simulationarea",
@@ -434,7 +436,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                     }
                 }, {
                     xtype: "label",
-                    text: "or",
+                    text: this.orText,
                     cls: "composite"
                 }, {
                     xtype: "button",
@@ -449,7 +451,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                     scope: this
                 }, {
                     xtype: "label",
-                    text: "or",
+                    text: this.orText,
                     cls: "composite"
                 }, {
                     xtype: "button",
@@ -557,7 +559,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                     }
                 }, {
                     xtype: "label",
-                    text: "or",
+                    text: this.orText,
                     cls: "composite"
                 }, {
                     xtype: "button",
@@ -577,7 +579,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                     scope: this
                 }, {
                     xtype: "label",
-                    text: "a",
+                    text: this.aText,
                     cls: "composite"
                 }, {
                     xtype: "combo",

@@ -34,6 +34,17 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
     errorTitle: "Error",
     errorMsg: "{0}: {1}",
     unknownErrorMsg: "The server returned an error: {0} {1}",
+    aboutText: "About TsuDAT Simulator", 
+    homeText: "TsuDAT Home",
+    loginText: "Login",
+    logoutText: "Logout",
+    defaultGroupTitle: "Overlays (optional)",
+    demGroupTitle: "Elevation Models (required)",
+    backgroundGroupTitle: "Base Layers",
+    loginWaitMsg: "Logging in...",
+    loginTitle: "GeoNode Login",
+    usernameLabel: "Username",
+    passwordLabel: "Password",
     /** end i18n */
 
     defaultSourceType: "gxp_wmscsource",
@@ -74,13 +85,13 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                     text: "&nbsp;TsuDAT&nbsp;",
                     menu: {
                         items: [{
-                            text: "About TsuDAT Simulator",
+                            text: this.aboutText,
                             iconCls: "about",
                             handler: function() {
                                 new Ext.Window({
                                     width: 400,
                                     height: 400,
-                                    title: "About TsuDAT Simulator",
+                                    title: this.aboutText,
                                     bodyCfg: {
                                         tag: "iframe",
                                         style: {border: "0px none"},
@@ -89,7 +100,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                                 }).show();
                             }
                         }, {
-                            text: "TsuDAT Home",
+                            text: this.homeText,
                             iconCls: "home",
                             handler: function() {
                                 window.location.href = "/";
@@ -101,7 +112,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                     ref: "loginName",
                     text: ""
                 }, {
-                    text: "Login",
+                    text: this.loginText,
                     ref: "loginButton",
                     iconCls: "login",
                     listeners: {
@@ -112,7 +123,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                         scope: this
                     }
                 }, {
-                    text: "Logout",
+                    text: this.logoutText,
                     ref: "logoutButton",
                     iconCls: "logout",
                     hidden: true,
@@ -199,10 +210,10 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             ptype: "gxp_layertree",
             outputTarget: "west",
             groups: {
-                "default": "Overlays (optional)",
-                "dem": "Elevation Models (required)",
+                "default": this.defaultGroupTitle,
+                "dem": this.demGroupTitle,
                 "background": {
-                    title: "Base Layers",
+                    title: this.backgroundGroupTitle,
                     exclusive: true
                 }
             },
@@ -398,7 +409,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
     login: function(options) {
         var submit = function() {
             form.getForm().submit({
-                waitMsg: "Logging in...",
+                waitMsg: this.loginWaitMsg,
                 success: function(form, action) {
                     win.close();
                     // resend the original request or call function
@@ -416,7 +427,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             });
         }.bind(this);
         var win = new Ext.Window({
-            title: "GeoNode Login",
+            title: this.loginTitle,
             modal: true,
             width: 230,
             autoHeight: true,
@@ -444,15 +455,15 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
                 items: [{
                     xtype: "textfield",
                     name: "username",
-                    fieldLabel: "Username"
+                    fieldLabel: this.usernameLabel
                 }, {
                     xtype: "textfield",
                     name: "password",
-                    fieldLabel: "Password",
+                    fieldLabel: this.passwordLabel,
                     inputType: "password"
                 }, {
                     xtype: "button",
-                    text: "Login",
+                    text: this.loginText,
                     inputType: "submit",
                     handler: submit
                 }]

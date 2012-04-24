@@ -33,6 +33,7 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
     uploadButtonText: "Upload",
     waitMsg: "Uploading your data...",
     errorTitle: "Error",
+    permissionsText: "Permissions",
 
     /** private: method[initComponent]
      */
@@ -161,10 +162,10 @@ TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
         }];
 
         this.buttons = [{
-            text: "Permissions",
+            text: this.permissionsText,
             handler: function() {
                 new Ext.Window({
-                    title: "Permissions",
+                    title: this.permissionsText,
                     resizable: false,
                     width: 260,
                     items: [{xtype: 'container', id: 'permissionsPanel'}]

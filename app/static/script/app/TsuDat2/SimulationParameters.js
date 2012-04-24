@@ -13,6 +13,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
     modelSetupLabel: "Model Setup",
     trialLabel: "Trial",
     finalLabel: "Final",
+    secondsText: "seconds",
     /** end i18n */
     
     ptype: "app_simulationparameters",
@@ -62,7 +63,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                     allowBlank: false
                 }, {
                     xtype: "label",
-                    text: "seconds",
+                    text: this.secondsText,
                     cls: "composite"
                 }]
             }, {
@@ -78,7 +79,7 @@ TsuDat2.SimulationParameters = Ext.extend(gxp.plugins.WizardStep, {
                     allowBlank: false
                 }, {
                     xtype: "label",
-                    text: "seconds",
+                    text: this.secondsText,
                     cls: "composite"
                 }]
             }, {
