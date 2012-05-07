@@ -76,7 +76,7 @@ GeoExt.Lang.add("en", {
         hazardPointEmptyText: "Select from map",
         returnPeriodLabel: "Return Period",
         waveHeightLabel: "Wave Height",
-        sourceDescription: "<b>Additionally, define the hazard source for the tsunami simulation.</b> Choose from the options below or select a sub-fault from the map.",
+        sourceInstructions: "<b>Additionally, define the hazard source for the tsunami simulation.</b> Choose from the options below or select a sub-fault from the map.",
         sourceLabel: "Source",
         eventGridInstructions: "Once the tsunami scenario has been defined and a hazard source selected, a table below will be populated with the events valid for this set of parameters.",
         probabilityTooltip: "Probability",

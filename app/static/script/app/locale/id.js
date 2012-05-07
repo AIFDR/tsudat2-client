@@ -76,7 +76,7 @@ GeoExt.Lang.add("id", {
         hazardPointEmptyText: "Pilih koordinat titik tinjau bahaya tsunami dari peta",
         returnPeriodLabel: "Perioda ulang",
         waveHeightLabel: "Tinggi gelombang",
-        sourceDescription: "<b>Informasi tambahan, definisikan sumber bahaya tsunami untuk simulasi.</b> Pilih dari beberapa pilihan berikut atau pilih sebuah segmen kecil dari peta",
+        sourceInstructions: "<b>Informasi tambahan, definisikan sumber bahaya tsunami untuk simulasi.</b> Pilih dari beberapa pilihan berikut atau pilih sebuah segmen kecil dari peta",
         sourceLabel: "Sumber",
         eventGridInstructions: "Setelah skenario simulasi model tsunami ditentukan dan sebuah sumber gempa penyebab tsunami dipilih, tabel di bawah ini akan akan menyajikan kejadian-kejadian yang sesuai dengan parameter yang diinginkan",
         probabilityTooltip: "Probabilitas",
