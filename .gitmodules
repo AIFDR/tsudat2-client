@@ -1,6 +1,6 @@
 [submodule "app/static/externals/geoext"]
 	path = app/static/externals/geoext
-	url = https://github.com/opengeo/GeoExt.git
+	url = https://github.com/geoext/geoext.git
 [submodule "app/static/externals/gxp"]
 	path = app/static/externals/gxp
 	url = https://github.com/opengeo/gxp.git
@@ -10,3 +10,12 @@
 [submodule "app/static/externals/geonode"]
 	path = app/static/externals/geonode
 	url = https://github.com/GeoNode/geonode-client.git
+[submodule "externals/stick"]
+	path = externals/stick
+	url = https://github.com/hns/stick.git
+[submodule "externals/buildkit"]
+	path = externals/buildkit
+	url = git://github.com/opengeo/buildkit.git
+[submodule "externals/ringojs-fork"]
+	path = externals/ringojs-fork
+	url = git://github.com/tschaub/ringojs.git
