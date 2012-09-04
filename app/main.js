@@ -23,6 +23,31 @@ if (geoserver) {
     // debug specific proxy
     app.mount("/geoserver/", require("./root/proxy").pass({url: geoserver, preserveHost: true, allowAuth: true}));
 }
+// proxy a remote tsudat app on /tsudat by setting proxy.tsudat to remote URL
+// only recommended for debug mode
+var tsudat = java.lang.System.getProperty("app.proxy.tsudat");
+if (tsudat) {
+    if (tsudat.charAt(tsudat.length-1) !== "/") {
+        tsudat = tsudat + "/";
+    }
+    // debug specific proxy
+    app.mount("/tsudat/", require("./root/proxy").pass({url: tsudat, allowAuth: true}));
+}
+
+// proxy a remote geonode on / by setting proxy.geonode to remote URL
+// only recommended for debug mode
+var geonode = java.lang.System.getProperty("app.proxy.geonode");
+if (geonode) {
+    if (geonode.charAt(geonode.length-1) !== "/") {
+       geonode = geonode + "/";
+    }
+    var geonodeUrls = ["data/upload", "data/acls", "accounts", "tsudat-media"];
+    var url;
+    for (var i=geonodeUrls.length-1; i>=0; --i) {
+        url = geonodeUrls[i];
+        app.mount("/" + url + "/", require("./root/proxy").pass({url: geonode + url, allowAuth: true}));
+    }
+}
 
 exports.app = app;
 
