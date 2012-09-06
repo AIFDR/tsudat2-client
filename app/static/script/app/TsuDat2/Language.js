@@ -1,3 +1,8 @@
+/**
+ * @require plugins/Tool.js
+ * @require GeoExt/Lang.js
+ */
+
 Ext.ns("TsuDat2.plugins");
 
 TsuDat2.plugins.Language = Ext.extend(gxp.plugins.Tool, {

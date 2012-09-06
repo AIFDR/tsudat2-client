@@ -2,6 +2,15 @@
  * Copyright (c) 2011 The Open Planning Project
  */
 
+/**
+ * @require GeoExt/Lang.js
+ * @require TsuDat2/Language.js
+ * @require TsuDat2/Scenario.js
+ * @require TsuDat2/SimulationParameters.js
+ * @require TsuDat2/GenerateSimulation.js
+ * @require TsuDat2/SimulationArea.js 
+ */
+
 Ext.BLANK_IMAGE_URL = "theme/app/img/blank.gif";
 OpenLayers.IMAGE_RELOAD_ATTEMPTS = 10;
 // the only resource we need from OpenLayers.ImgPath is blank.gif, and we take
@@ -22,7 +31,9 @@ if (params && params.project_id) {
 }
 GeoExt.Lang.set(params.lang || "en");
 
-var TsuDat2 = Ext.extend(gxp.Viewer, {
+Ext.ns("TsuDat2");
+
+TsuDat2.Viewer = Ext.extend(gxp.Viewer, {
     
     /** i18n */
     layersTabTitle: "Layers",
@@ -360,7 +371,7 @@ var TsuDat2 = Ext.extend(gxp.Viewer, {
             outputTarget: "step4"
         }];
 
-        TsuDat2.superclass.constructor.apply(this, arguments);
+        TsuDat2.Viewer.superclass.constructor.apply(this, arguments);
 
         this.addEvents(
             /** private: event[valid]

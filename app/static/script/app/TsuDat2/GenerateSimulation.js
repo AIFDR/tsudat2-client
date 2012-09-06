@@ -1,7 +1,9 @@
 /*
- * @require TsuDat2.js
+ * @require OpenLayers/Control/ModifyFeature.js
+ * @require plugins/WizardStep.js
  */
 
+Ext.ns("TsuDat2");
 TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     
     /** i18n */

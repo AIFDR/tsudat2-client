@@ -1,3 +1,6 @@
+/**
+ * @require GeoExt/Lang.js
+ */
 GeoExt.Lang.add("en", {
 
     "TsuDat2.prototype": {

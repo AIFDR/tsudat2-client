@@ -1,3 +1,6 @@
+/**
+ * @require GeoExt/Lang.js
+ */
 GeoExt.Lang.add("id", {
 
     "TsuDat2.prototype": {

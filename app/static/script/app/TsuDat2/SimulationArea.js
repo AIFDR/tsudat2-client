@@ -1,8 +1,10 @@
 /*
- * @require TsuDat2.js
  * @require TsuDat2/LayerUploadPanel.js
+ * @require OpenLayers/Control/ModifyFeature.js
+ * @require plugins/WizardStep.js
  */
 
+Ext.ns("TsuDat2");
 TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     
     /** i18n */
