@@ -4,6 +4,7 @@
 
 /**
  * @require GeoExt/Lang.js
+ * @require GeoExt/widgets/LegendPanel.js
  * @require TsuDat2/Language.js
  * @require TsuDat2/Scenario.js
  * @require TsuDat2/SimulationParameters.js

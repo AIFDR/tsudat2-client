@@ -1,6 +1,9 @@
 /*
  * @require TsuDat2/LayerUploadPanel.js
  * @require OpenLayers/Control/ModifyFeature.js
+ * @require OpenLayers/Control/DrawFeature.js
+ * @require OpenLayers/Handler/Polygon.js
+ * @require GeoExt/widgets/grid/FeatureSelectionModel.js
  * @require plugins/WizardStep.js
  */
 
