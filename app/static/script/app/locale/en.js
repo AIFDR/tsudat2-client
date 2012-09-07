@@ -3,7 +3,7 @@
  */
 GeoExt.Lang.add("en", {
 
-    "TsuDat2.prototype": {
+    "TsuDat2.Viewer.prototype": {
         layersTabTitle: "Layers",
         legendTabTitle: "Legend",
         step1Title: "Step 1. Tsunami Scenario",
@@ -27,6 +27,7 @@ GeoExt.Lang.add("en", {
     },
 
     "TsuDat2.GenerateSimulation.prototype": {
+        downloadText: "Download ANUGA script and data bundle",
         scenarioNameLabel: "Scenario Name",
         areaResolutionInstructions: "<b>Choose the area and resolution</b> over which to export the results.",
         simulationAreaLabel: "Simulation Area",

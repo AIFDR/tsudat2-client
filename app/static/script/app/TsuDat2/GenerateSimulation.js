@@ -10,6 +10,7 @@ Ext.ns("TsuDat2");
 TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     
     /** i18n */
+    downloadText: "Download ANUGA script and data bundle",
     scenarioNameLabel: "Scenario Name",
     areaResolutionInstructions: "<b>Choose the area and resolution</b> over which to export the results.",
     simulationAreaLabel: "Simulation Area",
@@ -281,9 +282,18 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
             buttonAlign: "left",
             fbar: new Ext.Toolbar({
                 items: [{
+                    text: this.downloadText,
+                    cls: "big-button",
+                    scale: "large",
+                    disabled: true,
+                    ref: "downloadSimulation",
+                    handler: this.download,
+                    scope: this
+                }, {
                     text: this.saveSimulationText,
                     ref: "saveSimulation",
                     cls: "big-button",
+                    hidden: true,
                     scale: "large",
                     disabled: true,
                     handler: this.saveScenario,
@@ -292,6 +302,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                     text: this.generateSimulationText,
                     ref: "generateSimulation",
                     cls: "big-button",
+                    hidden: true,
                     scale: "large",
                     disabled: true,
                     handler: this.runScenario,
@@ -301,6 +312,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
             listeners: {
                 "clientvalidation": function(cmp, valid) {
                     var fbar = this.form.getFooterToolbar();
+                    fbar.downloadSimulation.setDisabled(!valid);
                     fbar.saveSimulation.setDisabled(!valid);
                     fbar.generateSimulation.setDisabled(!(valid && this.scenarioId));
                 },
@@ -429,6 +441,10 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
                 scope: this
             });
         }, this);
+    },
+
+    download: function() {
+        // TOOD implement this when the server-side API is known
     }
     
 });
