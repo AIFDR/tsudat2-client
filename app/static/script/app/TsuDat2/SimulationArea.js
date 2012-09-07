@@ -15,9 +15,10 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     simulationAreaInstructions: "<b>Define the area for the tsunami simulation.</b> Draw or upload the area over which to run the simulation, add and rank elevation data, then define the default mesh resolution.",
     simulationAreaLabel: "Simulation Area",
     simulationAreaDrawButtonText: "Draw",
+    simulationAreaDownloadButtonText: "Download Tsunami Waveform Data",
     simulationAreaImportButtonText: "Import",
-    meshResolutionLabel: "Mesh Resolution",
-    meshFrictionLabel: "Mesh Friction",
+    meshResolutionLabel: "Simulation Area Mesh Resolution",
+    meshFrictionLabel: "Simulation Area Mesh Friction",
     elevationDataLabel: "Elevation Data",
     elevationDataAddButtonText: "Add data",
     elevationDataInstructions: "<b>Elevation data is the key input to generating a tsunami simulation.</b> Choose what elevation data will be used in the simulation. Then, order from highest quality to lowest (based on spatial resolution, quality and date) by dragging and dropping in layer pane on the left.",
@@ -469,10 +470,23 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                         this.addDem.actions[0].disable();
                         this.form.drawInternalPolygon.disable();
                         this.form.importInternalPolygon.disable();
+                        this.form.downloadWaveform.disable();
                         this.vectorLayer.removeFeatures([this.simulationArea]);
                         this.simulationArea = null;
                     },
                     scope: this
+                }]
+            }, {
+                xtype: "container",
+                layout: "hbox",
+                cls: "x-form-item composite-wrap",
+                fieldLabel: null,
+                items: [{
+                    xtype: "button",
+                    ref: "../downloadWaveform",
+                    disabled: true,
+                    text: this.simulationAreaDownloadButtonText,
+                    handler: this.downloadWaveformData
                 }]
             }, {
                 xtype: "container",
@@ -923,6 +937,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
         this.simulationArea = e.feature;
         this.drawControl.deactivate();
         this._toggling || this.modifyControl.selectControl.select(e.feature);
+        this.form.downloadWaveform.enable();
     },
     
     setInternalPolygonAttributes: function(e) {
@@ -1052,6 +1067,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                 tool.actions[0].setDisabled(disabled);
             }
         }
+    },
+
+    downloadWaveformData: function() {
+        // TODO implement this when we know what the server-side interface
+        // will look like.
     }
 
 });

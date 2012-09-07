@@ -93,12 +93,13 @@ GeoExt.Lang.add("en", {
     },
 
     "TsuDat2.SimulationArea.prototype": {
+        simulationAreaDownloadButtonText: "Download Tsunami Waveform Data",
         simulationAreaInstructions: "<b>Define the area for the tsunami simulation.</b> Draw or upload the area over which to run the simulation, add and rank elevation data, then define the default mesh resolution.",
         simulationAreaLabel: "Simulation Area",
         simulationAreaDrawButtonText: "Draw",
         simulationAreaImportButtonText: "Import",
-        meshResolutionLabel: "Mesh Resolution",
-        meshFrictionLabel: "Mesh Friction",
+        meshResolutionLabel: "Simulation Area Mesh Resolution",
+        meshFrictionLabel: "Simulation Area Mesh Friction",
         elevationDataLabel: "Elevation Data",
         elevationDataAddButtonText: "Add data",
         elevationDataInstructions: "<b>Elevation data is the key input to generating a tsunami simulation.</b> Choose what elevation data will be used in the simulation. Then, order from highest quality to lowest (based on spatial resolution, quality and date) by dragging and dropping in layer pane on the left.",

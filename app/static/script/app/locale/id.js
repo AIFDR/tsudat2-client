@@ -93,6 +93,7 @@ GeoExt.Lang.add("id", {
     },
 
     "TsuDat2.SimulationArea.prototype": {
+        simulationAreaDownloadButtonText: "Download Tsunami Waveform Data",
         simulationAreaInstructions: "<b>Menentukan wilayah simulasi tsunami.</b> Menggambar atau mengunggah wilayah yang akan disimulasikan, menambah dan menentuikan rangking data elevasi, kemudian menentukan resolusi (mesh)/grid/data batimetri standard.",
         simulationAreaLabel: "Wilayah Simulasi",
         simulationAreaDrawButtonText: "Gambar",
