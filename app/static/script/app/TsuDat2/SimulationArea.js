@@ -3,6 +3,7 @@
  * @require OpenLayers/Control/ModifyFeature.js
  * @require OpenLayers/Control/DrawFeature.js
  * @require OpenLayers/Handler/Polygon.js
+ * @require OpenLayers/Format/GeoJSON.js
  * @require GeoExt/widgets/grid/FeatureSelectionModel.js
  * @require plugins/WizardStep.js
  */
