@@ -444,7 +444,7 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     },
 
     download: function() {
-        // TOOD implement this when the server-side API is known
+        // TODO implement this when the server-side API is known
     }
     
 });
