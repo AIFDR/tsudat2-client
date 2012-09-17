@@ -1,6 +1,9 @@
+/**
+ * @require GeoExt/Lang.js
+ */
 GeoExt.Lang.add("id", {
 
-    "TsuDat2.prototype": {
+    "TsuDat2.Viewer.prototype": {
         layersTabTitle: "Layers",
         legendTabTitle: "Legenda",
         step1Title: "Tahap 1. Membuat skenario simulasi tsunami",
@@ -24,6 +27,7 @@ GeoExt.Lang.add("id", {
     },
 
     "TsuDat2.GenerateSimulation.prototype": {
+        downloadText: "Download ANUGA script and data bundle",
         scenarioNameLabel: "Nama skenario",
         areaResolutionInstructions: "<b>Pilih wilayah simulasi dan resolusi </b> dimana hasil simulasi akan disimpan?",
         simulationAreaLabel: "Wilayah simulasi",
@@ -90,6 +94,7 @@ GeoExt.Lang.add("id", {
     },
 
     "TsuDat2.SimulationArea.prototype": {
+        simulationAreaDownloadButtonText: "Download Tsunami Waveform Data",
         simulationAreaInstructions: "<b>Menentukan wilayah simulasi tsunami.</b> Menggambar atau mengunggah wilayah yang akan disimulasikan, menambah dan menentuikan rangking data elevasi, kemudian menentukan resolusi (mesh)/grid/data batimetri standard.",
         simulationAreaLabel: "Wilayah Simulasi",
         simulationAreaDrawButtonText: "Gambar",

@@ -1,6 +1,8 @@
-/*
- * @require TsuDat2.js
+/**
+ * @require FileUploadField.js
  */
+
+Ext.ns("TsuDat2");
 
 TsuDat2.LayerUploadPanel = Ext.extend(Ext.FormPanel, {
 

@@ -1,7 +1,8 @@
 /*
- * @require TsuDat2.js
+ * @require plugins/WizardStep.js
  */
 
+Ext.ns("TsuDat2");
 TsuDat2.Scenario = Ext.extend(gxp.plugins.WizardStep, {
     
     /** i18n */
