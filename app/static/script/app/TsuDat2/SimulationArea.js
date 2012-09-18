@@ -494,7 +494,8 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                     ref: "../downloadWaveform",
                     disabled: true,
                     text: this.simulationAreaDownloadButtonText,
-                    handler: this.downloadWaveformData
+                    handler: this.downloadWaveformData,
+                    scope: this
                 }]
             }, {
                 xtype: "container",
