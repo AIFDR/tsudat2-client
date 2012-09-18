@@ -113,7 +113,7 @@ GeoExt.Lang.add("id", {
         importTitle: "Memasukkan sebuah {0}",
         importInstructions: "<b>Pilih satu dari {0} format csv yang akan diunggah.</b> Jika koordinat tidak dalam bentuk lintang dan bujur sesuai standard WGS84, juga menyediakan sistem koordinati referensi (CRS), contoh sistem EPSG.",
         importProgress: "Mengunggah {0} Anda",
-        importErrorTitle: "Ada yg salah",
+        errorTitle: "Ada yg salah",
         importErrorMsg: "{0}: {1}",
         uploadButtonText: "Mengunggah",
         uploadFileLabel: "Berkas CSV",
@@ -121,7 +121,10 @@ GeoExt.Lang.add("id", {
         deleteButtonText: "Hapus",
         uploadText: "Mengunggah",
         orText: "atau",
-        aText: "sebuah"
+        aText: "sebuah",
+        downloadErrorMsg: "Something went wrong requesting a download. Please try again.",
+        downloadTitle: "Download",
+        downloadMsg: 'Download was successfully scheduled. You will receive an e-mail with all the details when the processing has finished.'
     },
 
     "TsuDat2.SimulationParameters.prototype": { 

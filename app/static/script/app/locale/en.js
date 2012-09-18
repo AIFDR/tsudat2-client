@@ -113,7 +113,7 @@ GeoExt.Lang.add("en", {
         importTitle: "Import a {0}",
         importInstructions: "<b>Select a {0} in csv format for uploading.</b> If the coordinates are not latitudes and longitudes in WGS84, also provide the appropriate coordinate reference system (CRS), e.g. an EPSG code.",
         importProgress: "Uploading your {0}",
-        importErrorTitle: "Error",
+        errorTitle: "Error",
         importErrorMsg: "{0}: {1}",
         uploadButtonText: "Upload",
         uploadFileLabel: "CSV file",
@@ -121,7 +121,10 @@ GeoExt.Lang.add("en", {
         deleteButtonText: "Delete",
         uploadText: "Upload",
         orText: "or",
-        aText: "a"
+        aText: "a",
+        downloadErrorMsg: "Something went wrong requesting a download. Please try again.",
+        downloadTitle: "Download",
+        downloadMsg: 'Download was successfully scheduled. You will receive an e-mail with all the details when the processing has finished.'
     },
 
     "TsuDat2.SimulationParameters.prototype": {

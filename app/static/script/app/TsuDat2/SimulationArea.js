@@ -31,7 +31,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     importTitle: "Import a {0}",
     importInstructions: "<b>Select a {0} in csv format for uploading.</b> If the coordinates are not latitudes and longitudes in WGS84, also provide the appropriate coordinate reference system (CRS), e.g. an EPSG code.",
     importProgress: "Uploading your {0}",
-    importErrorTitle: "Error",
+    errorTitle: "Error",
     importErrorMsg: "{0}: {1}",
     uploadButtonText: "Upload",
     uploadFileLabel: "CSV file",
@@ -40,6 +40,9 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     uploadText: "Upload",
     orText: "or",
     aText: "a",
+    downloadErrorMsg: "Something went wrong requesting a download. Please try again.",
+    downloadTitle: "Download",
+    downloadMsg: 'Download was successfully scheduled. You will receive an e-mail with all the details when the processing has finished.',
     /** end i18n */
     
     ptype: "app_simulationarea",
@@ -105,6 +108,11 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
      *  ``Number`` project id, obtained after a POST to /tsudat/project/
      */
     projectId: null,
+
+    /** private: property[eventId]
+     *  ``Number`` the identifier of the event chosen in the previous step
+     */
+    eventId: null,
     
     constructor: function(config) {
         TsuDat2.SimulationArea.superclass.constructor.apply(this, arguments);
@@ -685,6 +693,12 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             }
         }, this);
 
+        this.wizardContainer.on("wizardstepvalid", function(tool, data) {
+            if (data.event) {
+                this.eventId = data.event;
+            }
+        }, this);
+
         this.vectorLayer.events.on({
             "featureselected": function(e) {
                 this._toggling = true;
@@ -887,7 +901,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
                             },
                             failure: function(form, action) {
                                 Ext.Msg.show({
-                                    title: this.importErrorTitle,
+                                    title: this.errorTitle,
                                     msg: String.format(this.importErrorMsg, action.result.msg, action.result.reason),
                                     icon: Ext.MessageBox.ERROR,
                                     buttons: {ok: true}
@@ -1070,8 +1084,31 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
     },
 
     downloadWaveformData: function() {
-        // TODO implement this when we know what the server-side interface
-        // will look like.
+        Ext.Ajax.request({
+            method: "GET",
+            url: "/tsudat/download/",
+            params: {
+                project: this.projectId,
+                event_id: this.eventId
+            },
+            success: function(response) {
+                var ok = Ext.decode(response.responseText).success;
+                if (!ok) {
+                    Ext.Msg.alert(this.errorTitle, this.downloadErrorMsg);
+                } else {
+                    Ext.Msg.show({
+                        title: this.downloadTitle,
+                        msg: this.downloadMsg,
+                        buttons: Ext.Msg.OK,
+                        icon: Ext.MessageBox.INFO
+                    });
+                }
+            },
+            failure: function(response) {
+                Ext.Msg.alert(this.errorTitle, this.downloadErrorMsg);
+            },
+            scope: this
+        });
     }
 
 });
