@@ -1089,7 +1089,7 @@ TsuDat2.SimulationArea = Ext.extend(gxp.plugins.WizardStep, {
             method: "GET",
             url: "/tsudat/download/",
             params: {
-                project: this.projectId,
+                project_id: this.projectId,
                 event_id: this.eventId
             },
             success: function(response) {
