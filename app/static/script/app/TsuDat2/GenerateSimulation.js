@@ -444,7 +444,19 @@ TsuDat2.GenerateSimulation = Ext.extend(gxp.plugins.WizardStep, {
     },
 
     download: function() {
-        // TODO implement this when the server-side API is known
+	// Currently calling old run_scenario
+	// Needs to be updated to producing a download.
+        Ext.Msg.confirm(this.generateSimulationConfirmationTitle, this.generateSimulationConfirmationText, function(btn) {
+            btn == "yes" && Ext.Ajax.request({
+                method: "POST",
+                url: "/tsudat/run_scenario/" + this.scenarioId + "/",
+                success: function() {
+                    Ext.Msg.alert(this.queuedTitle, String.format(this.queuedMsg, this.scenarioId));
+                    this.scenarioId = null;
+                },
+                scope: this
+            });
+        }, this);
     }
     
 });
